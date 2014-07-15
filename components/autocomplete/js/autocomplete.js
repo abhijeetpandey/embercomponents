@@ -19,7 +19,8 @@
         }.property('propertiesToSearch'),
         searchResults:[],
         value:'', //by default will have same value of searchText (text)
-        valueType:'text', //additional type  required from autocomplete
+        valueType:'text', //additional type  required from autocomplete,
+        populateResults:true,
         focusOut:function (event) {
             this.send('focusOut', event);
         },
@@ -88,6 +89,9 @@
             return filteredContent.toArray();
         },
         searchTextObserver:function () {
+            if (!this.get('populateResults')) {
+                return;
+            }
             var parent = this;
             var searchText = this.get('searchText');
             if (searchText.length < this.get('minLength')) {
@@ -105,42 +109,49 @@
                         }).done(function (data) {
                                 items = JSON.parse(data);
                                 parent.get('cache').set(searchText, items);
+                                parent.prepareSearchResults(items, parent);
                             });
+                    } else {
+                        parent.prepareSearchResults(items, parent);
                     }
                 }
                 else {
                     items = this.getFilteredData(this.get('localdata'));
+                    parent.get('prepareSearchResults')(items, parent);
                 }
-                var auto = Ember.A();
-                var parent = this;
-                $.each(items, function (key, value) {
-                    if (typeof(value) == 'string') {
-                        auto.pushObject(Ember.Object.create({internal_id:key, text:value}));
-
-                    }
-                    else if (typeof(value) == 'object') {
-                        var obj = Ember.Object.create(value);
-                        obj.set('internal_id', key);
-                        obj.set('text', obj.get(parent.get('primaryText')));
-                        auto.pushObject(obj);
-                    }
-
-                });
-                this.set('searchResults', auto);
             }
         }.observes('searchText'),
+        prepareSearchResults:function (items, context) {
+            var parent = context;
+            var auto = Ember.A();
+            $.each(items, function (key, value) {
+                if (typeof(value) == 'string') {
+                    auto.pushObject(Ember.Object.create({internal_id:key, text:value}));
+
+                }
+                else if (typeof(value) == 'object') {
+                    var obj = Ember.Object.create(value);
+                    obj.set('internal_id', key);
+                    obj.set('text', obj.get(parent.get('primaryText')));
+                    auto.pushObject(obj);
+                }
+
+            });
+            context.set('searchResults', auto);
+        },
         actions:{
             changeText:function (internal_id) {
-
                 if (!this.IsNumeric(internal_id)) {
                     internal_id = this.get('currentIndex');
                 }
                 if (internal_id == -1)return;
                 if (this.get('searchResults').length == 0)return;
                 var obj = this.get('searchResults').filterBy('internal_id', internal_id).get(0);
-                this.set('searchText', obj.get('text'));
+                this.set('populateResults', false);
+                this.set('searchText', obj.get(this.get('primaryText')));
                 this.set('value', obj.get(this.get('valueType')));
                 this.set('searchResults', Ember.A());
+                this.set('populateResults', true);
             },
             traverse:function (event) {
                 var keyCode = event.keyCode;
@@ -162,10 +173,7 @@
             },
             focusOut:function (event) {
                 if (!this.get('mouseOver')) {
-                    var searchText = this.get('searchText');
                     this.set('currentIndex', 0);
-                    this.set('searchText', '');
-                    this.set('searchText', searchText);
                     this.set('searchResults', Ember.A());
                 }
             },
