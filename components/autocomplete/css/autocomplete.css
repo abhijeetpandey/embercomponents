@@ -1,7 +1,5 @@
 #cc-auto > .cc-autocomplete{
     position: absolute;
-    /*top: 100%;*/
-    /*left: 0;*/
     list-style: none;
     display:block;
     margin:auto;
@@ -10,7 +8,6 @@
     z-index: 1000;
     background-color: #ffffff;
     border-color: #ccc;
-    border-color: rgba(0, 0, 0, 0.2);
     border-style: solid;
     border-width: 1px;
     -webkit-border-radius: 5px;
@@ -26,7 +23,6 @@
     *border-bottom-width: 2px;
     float:left;
     padding: 4px 0;
-    margin: 2px 0 0 0;
 }
 
 #cc-auto .cc-autocomplete .cc-menu-item{
@@ -38,10 +34,6 @@
     background: #d9d9d9;
 }
 
-
 #cc-auto > .none{
     display:none;
 }
-
-
-
