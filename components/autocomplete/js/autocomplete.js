@@ -4,6 +4,7 @@
     Ember.TEMPLATES['ulViewContainer'] = Ember.Handlebars.compile("{{#each item in this}}{{view view.parentView.ItemView contextBinding='item' currentIndex=view.parentView.currentIndex}}{{/each}}");
 
     var AutoCompleteComponent = Ember.Component.extend({
+        cache:Ember.Map.create(),
         listItemContainer:"defaultItemContainer",
         localdata:[],
         primaryText:"text",
@@ -96,12 +97,16 @@
                 var url = this.get('url');
                 var response;
                 if (Ember.isEmpty(this.get('localdata'))) {
-                    response = $.ajax({
-                        type:"GET",
-                        url:(this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText),
-                        async:false
-                    }).responseText;
-                    items = JSON.parse(response);
+                    items = this.get('cache').get(searchText);
+                    if (Ember.isEmpty(items)) {
+                        response = $.ajax({
+                            type:"GET",
+                            url:(this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText),
+                            async:false
+                        }).responseText;
+                        items = JSON.parse(response);
+                        this.get('cache').set(searchText,items);
+                    }
                 }
                 else {
                     items = this.getFilteredData(this.get('localdata'));
