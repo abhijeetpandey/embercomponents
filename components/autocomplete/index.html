@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>AutoComplete Demo</title>
-  <link rel="stylesheet" href="/em/components/autocomplete/css/autocomplete.css">
+    <meta charset="utf-8">
+    <title>AutoComplete Demo</title>
+    <link rel="stylesheet" href="/em/components/autocomplete/css/autocomplete.css">
 </head>
 <body>
 <script type="text/x-handlebars" id="custom">
     {{label}}
- </script>
-  <script type="text/x-handlebars">
+</script>
+<script type="text/x-handlebars">
 
     <h2>AutoComplete Demo</h2>
     <span>Auto with url query param, custom template:{{auto-complete placeholder='Enter text' url="/codechef_register/autocomplete/institution/" qParam="term" listItemContainer="custom" primaryText="label"}}</span>
     <span>Auto with data source array:{{auto-complete localdata=data}}</span>
     {{outlet}}
-  </script>
+</script>
 
-  <script src="/em/libs/jquery/jquery.js"></script>
-  <script src="/em/libs/handlebars/handlebars.js"></script>
-  <script src="/em/libs/ember/canary.ember.js"></script>
-  <script src="/em/components/autocomplete/js/autocomplete.js"></script>
-  <script src="/em/components/autocomplete/autocomplete_app.js"></script>
+<script src="/em/libs/jquery/jquery.js"></script>
+<script src="/em/libs/handlebars/handlebars.js"></script>
+<script src="/em/libs/ember/canary.ember.js"></script>
+<script src="/em/components/autocomplete/js/autocomplete.js"></script>
+<script src="/em/components/autocomplete/autocomplete_app.js"></script>
 </body>
 </html>
 
