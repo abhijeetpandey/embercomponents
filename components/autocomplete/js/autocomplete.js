@@ -1,11 +1,3 @@
-/**
- * Created by IntelliJ IDEA.
- * User: abhijeet.pa
- * Date: 15/07/14
- * Time: 11:11 AM
- * To change this template use File | Settings | File Templates.
- */
-
 Ember.TEMPLATES['defaultItemContainer'] = Ember.Handlebars.compile("{{text}}");
 Ember.TEMPLATES['components/auto-complete'] = Ember.Handlebars.compile("<div id='cc-auto' >{{view textField placeholder=placeholder class=cssclass size=size maxlength=maxlength valueBinding='searchText'}}{{view UlView contextBinding='searchResults' index=currentIndex}}</div>");
 Ember.TEMPLATES['ulViewContainer'] = Ember.Handlebars.compile("{{#each item in this}}{{view view.parentView.ItemView contextBinding='item' currentIndex=view.parentView.currentIndex}}{{/each}}");
@@ -17,14 +9,18 @@ var AutoCompleteComponent = Ember.Component.extend({
     listItemContainer:"defaultItemContainer",
     localdata:[],
     primaryText:"text",
-    minLength:1,
+    minLength:3,
     url:'',
     searchText:'',
     currentIndex:-1,
     qParam:null, //by default set to null
+    propertiesToSearch:null,
+    getPropertiesToSearch:function () {
+        return !Ember.isEmpty(this.get('propertiesToSearch')) ? this.get('propertiesToSearch').split(',') : Ember.A([this.get('primaryText')]);
+    }.property('propertiesToSearch'),
     searchResults:[],
-    value:'',  //by default will have same value of searchText (text)
-    valueType:'text',//additional type  required from autocomplete
+    value:'', //by default will have same value of searchText (text)
+    valueType:'text', //additional type  required from autocomplete
     focusOut:function (event) {
         this.send('focusOut', event);
     },
@@ -37,7 +33,7 @@ var AutoCompleteComponent = Ember.Component.extend({
         }
     },
     click:function (event) {
-        this.send('changeText',this.get('currentIndex'));
+        this.send('changeText', this.get('currentIndex'));
     },
     mouseEnter:function (event) {
         this.send('changeMouseState', true);
@@ -78,6 +74,22 @@ var AutoCompleteComponent = Ember.Component.extend({
     IsNumeric:function (num) {
         return (num >= 0 || num < 0);
     },
+    getFilteredData:function (data) {
+        var filteredContent;
+        var parentThis = this;
+        filteredContent = $.grep(data, function (element, index) {
+            element = Ember.Object.create(element);
+            var valid = 0;
+            $.each(parentThis.get('getPropertiesToSearch'), function (key, value) {
+                var p = value.trim();
+                //searching here - by searching, I mean the value in the global search box
+                valid = valid || (element.get(p).toString().toLowerCase().indexOf(parentThis.get('searchText').toLowerCase()) + 1);
+            });
+            return (valid > 0);
+        });
+        console.log(filteredContent.toArray());
+        return filteredContent.toArray();
+    },
     searchTextObserver:function () {
         var searchText = this.get('searchText');
         if (searchText.length < this.get('minLength')) {
@@ -86,7 +98,7 @@ var AutoCompleteComponent = Ember.Component.extend({
             var items = [];
             var url = this.get('url');
             var response;
-            if(Ember.isEmpty(this.get('localdata'))){
+            if (Ember.isEmpty(this.get('localdata'))) {
                 response = $.ajax({
                     type:"GET",
                     url:(this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText),
@@ -94,9 +106,8 @@ var AutoCompleteComponent = Ember.Component.extend({
                 }).responseText;
                 items = JSON.parse(response);
             }
-            else
-            {
-                items=this.get('localdata');
+            else {
+                items = this.getFilteredData(this.get('localdata'));
             }
             var auto = Ember.A();
             var parent = this;
@@ -116,7 +127,6 @@ var AutoCompleteComponent = Ember.Component.extend({
             this.set('searchResults', auto);
         }
     }.observes('searchText'),
-
     actions:{
         changeText:function (internal_id) {
 
@@ -127,7 +137,7 @@ var AutoCompleteComponent = Ember.Component.extend({
             if (this.get('searchResults').length == 0)return;
             var obj = this.get('searchResults').filterBy('internal_id', internal_id).get(0);
             this.set('searchText', obj.get('text'));
-            this.set('value',obj.get(this.get('valueType')));
+            this.set('value', obj.get(this.get('valueType')));
             this.set('searchResults', Ember.A());
         },
         traverse:function (event) {
@@ -145,14 +155,13 @@ var AutoCompleteComponent = Ember.Component.extend({
             }
             this.set('currentIndex', currentIndex);
         },
-
         setCurrentIndex:function (index) {
             this.set('currentIndex', index);
         },
         focusOut:function (event) {
             if (!this.get('mouseOver')) {
                 var searchText = this.get('searchText');
-                this.set('currentIndex',0);
+                this.set('currentIndex', 0);
                 this.set('searchText', '');
                 this.set('searchText', searchText);
                 this.set('searchResults', Ember.A());
@@ -161,13 +170,12 @@ var AutoCompleteComponent = Ember.Component.extend({
         changeMouseState:function (state) {
             this.set('mouseOver', state);
         }
-
     }
 });
 
 Ember.Application.initializer({
-    name: "auto-complete-component",
-    initialize: function(container, application) {
+    name:"auto-complete-component",
+    initialize:function (container, application) {
         container.register('component:auto-complete', AutoCompleteComponent);
     }
 });
