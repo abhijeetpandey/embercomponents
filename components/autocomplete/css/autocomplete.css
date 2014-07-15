@@ -37,3 +37,7 @@
 #cc-auto > .none{
     display:none;
 }
+
+#cc-auto li {
+    list-style: none;
+}
