@@ -81,7 +81,6 @@
                 var valid = 0;
                 $.each(parentThis.get('getPropertiesToSearch'), function (key, value) {
                     var p = value.trim();
-                    //searching here - by searching, I mean the value in the global search box
                     valid = valid || (element.get(p).toString().toLowerCase().indexOf(parentThis.get('searchText').toLowerCase()) + 1);
                 });
                 return (valid > 0);
@@ -89,23 +88,24 @@
             return filteredContent.toArray();
         },
         searchTextObserver:function () {
+            var parent = this;
             var searchText = this.get('searchText');
             if (searchText.length < this.get('minLength')) {
                 this.set('searchResults', []);
             } else {
                 var items = [];
                 var url = this.get('url');
-                var response;
                 if (Ember.isEmpty(this.get('localdata'))) {
                     items = this.get('cache').get(searchText);
                     if (Ember.isEmpty(items)) {
-                        response = $.ajax({
+                        $.ajax({
                             type:"GET",
                             url:(this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText),
-                            async:false
-                        }).responseText;
-                        items = JSON.parse(response);
-                        this.get('cache').set(searchText,items);
+                            async:true
+                        }).done(function (data) {
+                                items = JSON.parse(data);
+                                parent.get('cache').set(searchText, items);
+                            });
                     }
                 }
                 else {
