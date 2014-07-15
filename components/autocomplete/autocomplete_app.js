@@ -9,6 +9,6 @@ App.IndexRoute = Ember.Route.extend({
 });
 App.ApplicationController=Ember.Controller.extend({
     data:function(){
-        return Ember.A(['kartik','singal','abhijeet','kartik','singal','abhijeet','kartik','singal','abhijeet','kartik','singal','abhijeet']);
+        return Ember.A([{text:'kartik'},{text:'singal'},{text:'abhijeet'},{text:'kartik'},{text:'singal'},{text:'abhijeet'},{text:'kartik'},{text:'singal'},{text:'abhijeet'},{text:'kartik'},{text:'singal'},{text:'abhijeet'}]);
     }.property()
 });
