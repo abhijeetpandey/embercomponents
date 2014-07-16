@@ -29,7 +29,7 @@
                 {{/if}}
             </div>
             <div class='perPage'>
-                <span>Rows :</span> {{view Ember.Select content=table.perPageSelector value=table.perPage}}
+                <span>Rows :</span> {{view Ember.Select content=table.perPageSelector value=table.itemsPerPage}}
             </div>
             {{#each this.filters}}
             <div class='filter'>
@@ -42,16 +42,20 @@
             <table class='dataTable'>
                 <thead>
                 <tr>
-                    {{#each table.properties}}
+                    {{#each header in table.headers}}
                     <th>
-                        <a href=''{{action 'getSortedContent' this}} >{{this}}</a></th>
+                    {{#if table.queryParamsEnabled}}
+                        {{#link-to 'application' (query-params page=1 sortBy=header.name order=header.order) target="controller"}}{{header.name}}{{/link-to}}
+                    {{else}}
+                        <a href=''{{action 'getSortedContent' value}} >{{value}}</a></th>
+                    {{/if}}
                     </th>
                     {{/each}}
                 </tr>
                 </thead>
 
                 <tbody>
-                {{#each table.data }}
+                {{#each table.paginatedContent }}
                 <tr>
                    <td>{{id}}</td><td>{{name}}</td><td>{{age}}</td>
                 </tr>
@@ -60,23 +64,45 @@
             </table>
         </div>
         <div class='paginator'>
+
+            {{#if table.queryParamsEnabled}}
+            <div class="previousPage">{{#link-to 'application' (query-params page=table.prevPage) target="controller"}}Prev{{/link-to}}
+            </div>
+            {{else}}
             <div class='previousPage'>{{#if table.prev}}<a href='' {{action getPreviousPage}}>prev</a>
                 {{else}}prev{{/if}}
             </div>
+            {{/if}}
+
             <div style='text-align: center;width: 50%;float: left;'>
                 <div class=' pageInfo
-            '>{{table.currentPage}} of {{table.totalPages}}
+            '>{{table.currentPage}} of {{table.availablePages}}
                 </div>
             </div>
-            <div class='nextPage'>{{#if table.next}}<a href='' {{action getNextPage}}>next</a>{{else}}next{{/if}}
+            {{#if table.queryParamsEnabled}}
+            <div class="nextPage">{{#link-to 'application' (query-params page=table.nextPage) target="controller"}}Next{{/link-to}}
             </div>
+            {{else}}
+            <div class='nextPage'>{{#if table.next}}<a href=''{{action getNextPage}}>next</a>{{else}}next{{/if}}
+            </div>
+            {{/if}}
         </div>
+
+
     </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="pagination">
+    {{#with view}}
+    {{#link-to 'table.page' page}}
+    {{content.page_id}}
+    {{/link-to}}
+    {{/with}}
 </script>
 
 <script src="/em/libs/jquery/jquery.js"></script>
 <script src="/em/libs/handlebars/handlebars.js"></script>
-<script src="/em/libs/ember/debug.ember.js"></script>
+<script src="/em/libs/ember/canary.ember.js"></script>
 <script src="/em/components/datatable/js/datatable.js"></script>
 <script src="/em/components/datatable/datatable_app.js"></script>
 </body>

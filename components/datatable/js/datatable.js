@@ -12,6 +12,72 @@ var ColumnNamesMixin = Ember.Mixin.create({
     }.property('content')
 });
 
+var PaginationMixin = Ember.Mixin.create({
+    itemsPerPage:20,
+    perPageSelector:[10, 20, 30, 40, 50],
+    currentPage:1,
+    page:1,
+    pageObserver:function () {
+        this.set('currentPage', this.get('page'));
+    }.observes('page'),
+    prev:function () {
+        return this.get('currentPage') > 1;
+    }.property('currentPage'),
+    next:function () {
+        return this.get('currentPage') != this.get('availablePages');
+    }.property('currentPage', 'availablePages'),
+    pages:function () {
+        var availablePages = this.get('availablePages'),
+            pages = [];
+        for (var i = 0; i < availablePages; i++) {
+            var page = i + 1;
+            pages.push(page.toString());
+        }
+        return pages;
+    }.property('availablePages'),
+    nextPage:function () {
+        var nextPage = parseInt(this.get('currentPage')) + 1;
+        var availablePages = this.get('availablePages');
+        if (nextPage <= availablePages) {
+            return nextPage;
+        } else {
+            return this.get('currentPage');
+        }
+    }.property('currentPage', 'availablePages'),
+    prevPage:function () {
+        var prevPage = parseInt(this.get('currentPage')) - 1;
+        if (prevPage > 0) {
+            return prevPage;
+        } else {
+            return this.get('currentPage');
+        }
+    }.property('currentPage', 'availablePages'),
+    availablePages:function () {
+        return Math.ceil((this.get('fullData.length') / this.get('itemsPerPage')) || 1);
+    }.property('fullData.length', 'itemsPerPage'),
+    paginatedContent:function () {
+        var currentPage = this.get('currentPage') || 1;
+        var upperBound = (currentPage * this.get('itemsPerPage'));
+        var lowerBound = (currentPage * this.get('itemsPerPage')) - this.get('itemsPerPage');
+        var models = this.get('fullData');
+        return models.slice(lowerBound, upperBound);
+    }.property('currentPage', 'fullData.@each', 'itemsPerPage', 'reRender'),
+    actions:{
+        nextPage:function () {
+            if (this.get('currentPage') >= this.get('availablePages')) {
+                return null;
+            }
+            this.set('currentPage', this.get('currentPage') + 1);
+        },
+        previousPage:function () {
+            if (this.get('currentPage') <= 1) {
+                return null;
+            }
+            this.set('currentPage', this.get('currentPage') - 1);
+        }
+    }
+});
+
 var FilterContentMixin = Ember.Mixin.create(ColumnNamesMixin, Ember.SortableMixin, {
     content:[],
     search:'',
@@ -34,65 +100,45 @@ var FilterContentMixin = Ember.Mixin.create(ColumnNamesMixin, Ember.SortableMixi
 });
 
 //creates an array sortable on columns and searchable as well
-var DataTableMixin = Ember.Mixin.create(FilterContentMixin, {
-    perPage:10,
-    perPageSelector:[10, 20, 30, 40, 50],
+var DataTableMixin = Ember.Mixin.create(FilterContentMixin, PaginationMixin, {
     search:'',
     searchable:true,
     sortProperties:['id'],
     sortAscending:true,
-    currentPage:1,
-    prev:function () {
-        return this.get('currentPage') > 1;
-    }.property('currentPage'),
-    next:function () {
-        return this.get('currentPage') != this.get('totalPages');
-    }.property('currentPage', 'totalPages'),
-    totalPages:0,
+    headers:function () {
+        var properties = this.get('properties');
+        var obj = [];
+        var sortBy = this.get('sortBy');
+        var order = this.get('order');
+        $.each(properties, function (key, value) {
+            obj.push({name:value, order:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'desc' : 'asc') : 'asc') : 'asc') : 'asc')});
+        });
+        return obj;
+    }.property('properties', 'sortBy', 'order'),
+    sortByObserver:function () {
+        var sortBy = this.get('sortBy');
+        this.set('sortProperties', (!Ember.isEmpty(sortBy) ? [sortBy] : ['id']));
+    }.observes('sortBy'),
+    orderObserver:function () {
+        var order = this.get('order');
+        this.set('sortAscending', (!Ember.isEmpty(order) ? order == 'asc' : true));
+    }.observes('order'),
     actions:{
-        toggleRender:function () {
-            this.set('render', !this.set('render'));
-        },
         propSort:function (property) {
             this.set('sortAscending', (this.sortProperties[0] === property ? !this.sortAscending : true));
             this.set('sortProperties', [property]);
             this.set('currentPage', 1);
-        },
-        nextPage:function () {
-            if (this.get('currentPage') >= this.get('totalPages')) {
-                return null;
-            }
-            this.set('currentPage', this.get('currentPage') + 1);
-        },
-        previousPage:function () {
-            if (this.get('currentPage') <= 1) {
-                return null;
-            }
-            this.set('currentPage', this.get('currentPage') - 1);
         }
     },
     fullData:function () {
-        var returnData = this.get("search") !== "" ? this.get('filteredContent') : this.get('sortedContent');
-        this.set('totalPages', Math.ceil(returnData.length / this.get('perPage')));
-        this.set('currentPage', (this.get('totalPages') === 0 ? 0 : (this.get('currentPage') > this.get('totalPages') ?
-            this.get('totalPages') : this.get('currentPage'))));
-        return returnData;
-    }.property('currentPage', 'perPage', 'sortedContent', 'filteredContent', 'search', 'render'),
-    data:function () {
-        return this.get('fullData').slice(this.get('startIndex'), this.get('endIndex'));
-    }.property('fullData'),
+        return  this.get("search") !== "" ? this.get('filteredContent') : this.get('sortedContent');
+    }.property('sortedContent', 'filteredContent', 'search', 'render'),
     searchObserver:function () {
         this.set('currentPage', 1);
     }.observes('search'),
     sortedContent:function () {
         return this.toArray();
-    }.property('content', 'sortAscending', 'sortProperties'),
-    startIndex:function () {
-        return (this.get('currentPage') - 1) * this.get('perPage');
-    }.property('currentPage', 'perPage'),
-    endIndex:function () {
-        return this.get('startIndex') + this.get('perPage');
-    }.property('startIndex')
+    }.property('content', 'sortAscending', 'sortProperties')
 });
 
 //component to create a table using sortable & searchable array
@@ -151,4 +197,11 @@ Ember.Handlebars.registerHelper('eachMyProperty', function (context, options) {
         }
     });
     return ret;
+});
+
+Ember.Handlebars.registerHelper('if_eq', function (a, b, opts) {
+    if (a == b) // Or === depending on your needs
+        return opts.fn(this);
+    else
+        return opts.inverse(this);
 });
