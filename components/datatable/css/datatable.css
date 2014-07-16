@@ -1,0 +1,150 @@
+.modal {
+    position: fixed;
+    top: 40px;
+    width: 76%;
+    display: block;
+    z-index: 1050;
+    margin: auto;
+    background: white;
+    min-height: 30%;
+    max-height: 75%;
+    left: 7%;
+    right: 7%;
+    overflow: auto;
+}
+
+.overlay {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    /*background-color: rgba(0, 0, 0, 0.2);*/
+    background: rgb(0, 0, 0);
+    background: transparent;
+    background: rgba(0, 0, 0, 0.4);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #66000000, endColorstr = #66000000);
+    zoom: 1;
+    z-index: 1001;
+}
+
+.greyout {
+    background: rgb(0, 0, 0);
+    background: transparent;
+    background: rgba(0, 0, 0, 0.4);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #66000000, endColorstr = #66000000);
+    z-index: 100001;
+}
+
+.flush--top {
+    margin-top: 0;
+    overflow: scroll;
+}
+
+.table-component {
+    width: 98%;
+    margin: auto;
+}
+
+.topBox {
+    width: 912px;
+    margin: 0 auto 10px auto;
+    border: #b3b3b3 solid 1px;
+    background: #f1f1f1;
+    padding-top: 8px;
+    font-size: 12px;
+    height: 30px;
+}
+
+.searchBox {
+    float: left;
+}
+
+.searchBox>span, .perPage>span {
+    margin: 0 10px;
+}
+
+.searchBox>input {
+    width: 144px;
+    border: #b3b3b3 solid 1px;
+    height: 15px;
+    color: #666;
+    padding: 3px;
+}
+
+.perPage {
+    float: left;
+}
+
+.perPage>select {
+    width: 50px;
+    border: #b3b3b3 solid 1px;
+    height: 20px;
+    color: #666;
+}
+
+.dataTable {
+    width: 913px;
+    border: #E0E0E0 solid 1px;
+    border-collapse: collapse;
+}
+
+.dataTable>tbody>tr {
+    height: 40px;
+}
+
+.dataTable>thead>tr>th {
+    background: #6E9E90 !important;
+    color: #FFF;
+    font-weight: bold;
+    height: 20px;
+}
+
+.dataTable>thead>tr>th>a {
+    color: #FFF;
+}
+
+.dataTable>tbody>tr:nth-child(odd) {
+    background: #E0E0E0;
+}
+
+.paginator {
+    width: 912px;
+    margin: 10px auto 10px auto;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.pageInfo {
+    border: #b3b3b3 solid 1px;
+    width: 90px;
+    padding: 3px;
+    text-align: center;
+    margin: auto;
+}
+
+.nextPage {
+    text-align: right;
+    width: 25%;
+    float: left;
+    color: #808080;
+}
+
+.previousPage {
+    text-align: left;
+    width: 25%;
+    float: left;
+    color: #808080;
+}
+
+.red {
+    color: red;
+}
+.table{
+    width: 912px;
+    margin: 0 auto 10px auto;
+}
