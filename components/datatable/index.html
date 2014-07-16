@@ -10,7 +10,7 @@
     {{outlet}}
     <div
     {{bind-attr class=cssClass}}></div>
-    {{#data-table table=this propSort="propSort" previousPage="previousPage" nextPage="nextPage" loading="loading"
+    {{#data-table linkRouter='application' table=this propSort="propSort" previousPage="previousPage" nextPage="nextPage" loading="loading"
     ready="ready" openModal="openModal" closeModal="closeModal"}}
     <h3 style="text-align:center">Datatable example</h3><br/>
     {{/data-table}}
@@ -45,9 +45,9 @@
                     {{#each header in table.headers}}
                     <th>
                     {{#if table.queryParamsEnabled}}
-                        {{#link-to 'application' (query-params page=1 sortBy=header.name order=header.order) target="controller"}}{{header.name}}{{/link-to}}
+                        {{#link-to linkRouter (query-params page=1 sortBy=header.name order=header.order) target="controller"}}{{header.name}}{{/link-to}}
                     {{else}}
-                        <a href=''{{action 'getSortedContent' value}} >{{value}}</a></th>
+                        <a href=''{{action 'getSortedContent' header.name}} >{{header.name}}</a></th>
                     {{/if}}
                     </th>
                     {{/each}}
@@ -66,7 +66,7 @@
         <div class='paginator'>
 
             {{#if table.queryParamsEnabled}}
-            <div class="previousPage">{{#link-to 'application' (query-params page=table.prevPage) target="controller"}}Prev{{/link-to}}
+            <div class="previousPage">{{#link-to linkRouter (query-params page=table.prevPage) target="controller"}}Prev{{/link-to}}
             </div>
             {{else}}
             <div class='previousPage'>{{#if table.prev}}<a href='' {{action getPreviousPage}}>prev</a>
@@ -80,7 +80,7 @@
                 </div>
             </div>
             {{#if table.queryParamsEnabled}}
-            <div class="nextPage">{{#link-to 'application' (query-params page=table.nextPage) target="controller"}}Next{{/link-to}}
+            <div class="nextPage">{{#link-to linkRouter (query-params page=table.nextPage) target="controller"}}Next{{/link-to}}
             </div>
             {{else}}
             <div class='nextPage'>{{#if table.next}}<a href=''{{action getNextPage}}>next</a>{{else}}next{{/if}}
