@@ -24,12 +24,11 @@
         focusOut:function (event) {
             this.send('focusOut', event);
         },
-        keyUp:function (event) {
-            this.send('traverse', event);
-        },
         keyDown:function (event) {
             if (event.keyCode == 9) {
                 this.send('changeText');
+            }else{
+                this.send('traverse', event);
             }
         },
         click:function (event) {
@@ -69,7 +68,11 @@
             templateName:'ulViewContainer',
             dynamicClass:function () {
                 return this.get('context').length == 0 ? 'none' : '';
-            }.property('context')
+            }.property('context'),
+            didInsertElement:function () {
+                var outerWidth = $(this.get('parentView').$()[0].firstChild.childNodes[0]).outerWidth();
+                this.$().css('min-width', outerWidth);
+            }
         }),
         IsNumeric:function (num) {
             return (num >= 0 || num < 0);

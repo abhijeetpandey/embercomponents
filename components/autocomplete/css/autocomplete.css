@@ -3,16 +3,11 @@
     list-style: none;
     display:block;
     margin:auto;
-    min-width: 160px;
-    _width:160px;
     z-index: 1000;
     background-color: #ffffff;
     border-color: #ccc;
     border-style: solid;
     border-width: 1px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
     -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -22,7 +17,7 @@
     *border-right-width: 2px;
     *border-bottom-width: 2px;
     float:left;
-    padding: 4px 0;
+    padding:1px 0;
 }
 
 #cc-auto .cc-autocomplete .cc-menu-item{
@@ -31,7 +26,8 @@
 }
 
 #cc-auto .cc-autocomplete .is-active {
-    background: #d9d9d9;
+    background: #00a2ff;
+    color:white;
 }
 
 #cc-auto > .none{
