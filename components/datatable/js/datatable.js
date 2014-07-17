@@ -13,6 +13,7 @@ var ColumnNamesMixin = Ember.Mixin.create({
 });
 
 var PaginationMixin = Ember.Mixin.create({
+    queryParams:['page','itemsPerPage'],
     itemsPerPage:20,
     perPageSelector:[10, 20, 30, 40, 50],
     currentPage:1,
@@ -83,6 +84,7 @@ var FilterContentMixin = Ember.Mixin.create(ColumnNamesMixin, Ember.SortableMixi
     search:'',
     sortProperties:['id'],
     sortAscending:true,
+    queryParams:['search'],
     filteredContent:function () {
         var filteredContent;
         var parentThis = this;
@@ -90,8 +92,7 @@ var FilterContentMixin = Ember.Mixin.create(ColumnNamesMixin, Ember.SortableMixi
             var valid = 0;
             element = Ember.Object.create(element);
             $.each(parentThis.get('properties'), function (key, value) {
-                var p = value;
-                valid = valid || (element.get(p).toString().indexOf(parentThis.get('search')) + 1);
+                valid = valid || (element.get(value).toString().indexOf(parentThis.get('search')) + 1);
             });
             return (valid > 0);
         });
@@ -101,10 +102,10 @@ var FilterContentMixin = Ember.Mixin.create(ColumnNamesMixin, Ember.SortableMixi
 
 //creates an array sortable on columns and searchable as well
 var DataTableMixin = Ember.Mixin.create(FilterContentMixin, PaginationMixin, {
-    search:'',
     searchable:true,
     sortProperties:['id'],
     sortAscending:true,
+    queryParams:['order','sortBy'],
     headers:function () {
         var properties = this.get('properties');
         var obj = [];

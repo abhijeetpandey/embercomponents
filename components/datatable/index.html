@@ -28,14 +28,15 @@
                 <span>Search :</span>{{input type='text' value=table.search}}<br/>
                 {{/if}}
             </div>
+
             <div class='perPage'>
                 <span>Rows :</span> {{view Ember.Select content=table.perPageSelector value=table.itemsPerPage}}
             </div>
-            {{#each this.filters}}
+
             <div class='filter'>
-                <span>{{name}} :</span> {{view Ember.Select content=filter value=filterValues}}
+                <span>Filters :</span> {{view Ember.Select content=table.availableFilters value=filterValues}}
+                <span>Applied Filters</span>
             </div>
-            {{/each}}
 
         </div>
         <div class="table">
