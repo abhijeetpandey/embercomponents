@@ -10,8 +10,10 @@
     {{outlet}}
     <div
     {{bind-attr class=cssClass}}></div>
-    {{#data-table linkRouter='application' table=this propSort="propSort" previousPage="previousPage" nextPage="nextPage" loading="loading"
-    ready="ready" openModal="openModal" closeModal="closeModal"}}
+    {{triggerFilter}}
+    {{#data-table linkRouter='application' table=this propSort="propSort" previousPage="previousPage"
+    nextPage="nextPage" loading="loading"
+    ready="ready" openModal="openModal" closeModal="closeModal" applyFilter="applyFilter" removeFilter="removeFilter"}}
     <h3 style="text-align:center">Datatable example</h3><br/>
     {{/data-table}}
 </script>
@@ -34,8 +36,16 @@
             </div>
 
             <div class='filter'>
-                <span>Filters :</span> {{view Ember.Select content=table.availableFilters value=filterValues}}
+                {{#if table.availableFilters.length}}
+                <span>Filters :</span> {{view Ember.Select content=table.availableFilters value=table.filterName}}
+                {{input value=table.filterValue}} <a {{action 'addFilter'}} >Apply</a>
+                {{/if}}
+                {{#if table.appliedFilters.length}}
                 <span>Applied Filters</span>
+                {{#each filter in table.appliedFilters}}
+                <span>{{filter.name}}:{{filter.value}} <a {{action 'deleteFilter' filter.name filter.value}}> X </a> </span>
+                {{/each}}
+                {{/if}}
             </div>
 
         </div>
@@ -45,9 +55,10 @@
                 <tr>
                     {{#each header in table.headers}}
                     <th>
-                    {{#if table.queryParamsEnabled}}
-                        {{#link-to linkRouter (query-params page=1 sortBy=header.name order=header.order) target="controller"}}{{header.name}}{{/link-to}}
-                    {{else}}
+                        {{#if table.queryParamsEnabled}}
+                        {{#link-to linkRouter (query-params page=1 sortBy=header.name order=header.order)
+                        target="controller"}}{{header.name}}{{/link-to}}
+                        {{else}}
                         <a href=''{{action 'getSortedContent' header.name}} >{{header.name}}</a></th>
                     {{/if}}
                     </th>
@@ -58,7 +69,9 @@
                 <tbody>
                 {{#each table.paginatedContent }}
                 <tr>
-                   <td>{{id}}</td><td>{{name}}</td><td>{{age}}</td>
+                    <td>{{id}}</td>
+                    <td>{{name}}</td>
+                    <td>{{age}}</td>
                 </tr>
                 {{/each}}
                 </tbody>
@@ -67,7 +80,8 @@
         <div class='paginator'>
 
             {{#if table.queryParamsEnabled}}
-            <div class="previousPage">{{#link-to linkRouter (query-params page=table.prevPage) target="controller"}}Prev{{/link-to}}
+            <div class="previousPage">{{#link-to linkRouter (query-params page=table.prevPage)
+                target="controller"}}Prev{{/link-to}}
             </div>
             {{else}}
             <div class='previousPage'>{{#if table.prev}}<a href='' {{action getPreviousPage}}>prev</a>
@@ -81,7 +95,8 @@
                 </div>
             </div>
             {{#if table.queryParamsEnabled}}
-            <div class="nextPage">{{#link-to linkRouter (query-params page=table.nextPage) target="controller"}}Next{{/link-to}}
+            <div class="nextPage">{{#link-to linkRouter (query-params page=table.nextPage)
+                target="controller"}}Next{{/link-to}}
             </div>
             {{else}}
             <div class='nextPage'>{{#if table.next}}<a href=''{{action getNextPage}}>next</a>{{else}}next{{/if}}

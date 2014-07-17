@@ -13,7 +13,7 @@ var ColumnNamesMixin = Ember.Mixin.create({
 });
 
 var PaginationMixin = Ember.Mixin.create({
-    queryParams:['page','itemsPerPage'],
+//    queryParams:['page', 'itemsPerPage'],
     itemsPerPage:20,
     perPageSelector:[10, 20, 30, 40, 50],
     currentPage:1,
@@ -62,7 +62,7 @@ var PaginationMixin = Ember.Mixin.create({
         var lowerBound = (currentPage * this.get('itemsPerPage')) - this.get('itemsPerPage');
         var models = this.get('fullData');
         return models.slice(lowerBound, upperBound);
-    }.property('currentPage', 'fullData.@each', 'itemsPerPage', 'reRender'),
+    }.property('currentPage', 'fullData.@each', 'itemsPerPage'),
     actions:{
         nextPage:function () {
             if (this.get('currentPage') >= this.get('availablePages')) {
@@ -79,33 +79,38 @@ var PaginationMixin = Ember.Mixin.create({
     }
 });
 
-var FilterContentMixin = Ember.Mixin.create(ColumnNamesMixin, Ember.SortableMixin, {
-    content:[],
-    search:'',
-    sortProperties:['id'],
-    sortAscending:true,
-    queryParams:['search'],
-    filteredContent:function () {
-        var filteredContent;
-        var parentThis = this;
-        filteredContent = $.grep(parentThis.toArray(), function (element, index) {
-            var valid = 0;
-            element = Ember.Object.create(element);
-            $.each(parentThis.get('properties'), function (key, value) {
-                valid = valid || (element.get(value).toString().indexOf(parentThis.get('search')) + 1);
-            });
-            return (valid > 0);
-        });
-        return filteredContent.toArray();
-    }.property('content', 'search', 'sortProperties', 'sortAscending')
-});
-
 //creates an array sortable on columns and searchable as well
-var DataTableMixin = Ember.Mixin.create(FilterContentMixin, PaginationMixin, {
+var DataTableMixin = Ember.Mixin.create(ColumnNamesMixin,Ember.SortableMixin, PaginationMixin, {
     searchable:true,
     sortProperties:['id'],
     sortAscending:true,
-    queryParams:['order','sortBy'],
+    search:'',
+    appliedFilters:[],
+    actions:{
+        propSort:function (property) {
+            this.set('sortAscending', (this.sortProperties[0] === property ? !this.sortAscending : true));
+            this.set('sortProperties', [property]);
+            this.set('currentPage', 1);
+        },
+        applyFilter:function () {
+            var appliedFilters = this.get('appliedFilters');
+            var filterName = this.get('filterName');
+            var filterValue = this.get('filterValue');
+            var obj = {name:filterName, value:filterValue};
+            appliedFilters.pushObject(obj);
+            this.set('filterValue', '');
+        },
+        removeFilter:function (name, value) {
+            var appliedFilters = this.get('appliedFilters');
+            var newFilters = [];
+            $.each(appliedFilters, function (key, value) {
+                if (value.name != name) {
+                    newFilters.push({name:value.name, value:value.value});
+                }
+            });
+            this.set('appliedFilters', newFilters);
+        }
+    },
     headers:function () {
         var properties = this.get('properties');
         var obj = [];
@@ -116,6 +121,70 @@ var DataTableMixin = Ember.Mixin.create(FilterContentMixin, PaginationMixin, {
         });
         return obj;
     }.property('properties', 'sortBy', 'order'),
+    availableFilters:function () {
+        var filters = this.get('filters');
+        var appliedFilters = this.get('appliedFilters');
+        var columns = [];
+        var availableFilters = [];
+        $.each(appliedFilters, function (key, value) {
+            columns.push(value.name);
+        });
+
+        $.each(filters, function (key, value) {
+            if ($.inArray(value, columns) == -1) {
+                availableFilters.push(value);
+            }
+        });
+        this.set('filterName', availableFilters[0]);
+        return availableFilters;
+    }.property('appliedFilters.length'),
+    filters:function () {
+        return this.get('properties');
+    }.property('properties'),
+    sortedContent:function () {
+        return this.toArray();
+    }.property('content', 'sortAscending', 'sortProperties'),
+    searchedContent:function () {
+        var searchedContent;
+        var search = this.get('search').trim();
+        var properties = this.get('properties');
+        var sortedContent = this.get('sortedContent');
+        searchedContent = $.grep(sortedContent, function (element, index) {
+            var valid = 0;
+            element = Ember.Object.create(element);
+            $.each(properties, function (key, value) {
+                valid = valid || (element.get(value).toString().indexOf(search) + 1);
+            });
+
+            return (valid > 0);
+        });
+        return searchedContent.toArray();
+    }.property('search','sortedContent'),
+    filteredContent:function () {
+        console.log('here');
+        var searchedContent = this.get('searchedContent');
+        var filteredContent;
+        var appliedFilters = this.get('appliedFilters');
+        filteredContent = $.grep(searchedContent.toArray(), function (element, index) {
+            var valid = 1;
+            element = Ember.Object.create(element);
+            $.each(appliedFilters, function (key, value) {
+                console.log(value.value);
+                console.log(element.get(value.name));
+                console.log(element.get(value.name).toString() == value.value.toString());
+                valid = valid && (element.get(value.name).toString() == value.value.toString());
+            });
+            return (valid > 0);
+        });
+        console.log(filteredContent);
+        return filteredContent.toArray();
+    }.property('filterName','searchedContent'),
+    fullData:function () {
+               return this.get('filteredContent');
+    }.property('filteredContent'),
+    searchObserver:function () {
+        this.set('currentPage', 1);
+    }.observes('search'),
     sortByObserver:function () {
         var sortBy = this.get('sortBy');
         this.set('sortProperties', (!Ember.isEmpty(sortBy) ? [sortBy] : ['id']));
@@ -123,23 +192,7 @@ var DataTableMixin = Ember.Mixin.create(FilterContentMixin, PaginationMixin, {
     orderObserver:function () {
         var order = this.get('order');
         this.set('sortAscending', (!Ember.isEmpty(order) ? order == 'asc' : true));
-    }.observes('order'),
-    actions:{
-        propSort:function (property) {
-            this.set('sortAscending', (this.sortProperties[0] === property ? !this.sortAscending : true));
-            this.set('sortProperties', [property]);
-            this.set('currentPage', 1);
-        }
-    },
-    fullData:function () {
-        return  this.get("search") !== "" ? this.get('filteredContent') : this.get('sortedContent');
-    }.property('sortedContent', 'filteredContent', 'search', 'render'),
-    searchObserver:function () {
-        this.set('currentPage', 1);
-    }.observes('search'),
-    sortedContent:function () {
-        return this.toArray();
-    }.property('content', 'sortAscending', 'sortProperties')
+    }.observes('order')
 });
 
 //component to create a table using sortable & searchable array
@@ -169,6 +222,16 @@ var DataTableComponent = Ember.Component.extend(Ember.TargetActionSupport, {
         getPreviousPage:function () {
             this.send('loading');
             this.sendAction('previousPage');
+            this.send('ready');
+        },
+        addFilter:function () {
+            this.send('loading');
+            this.sendAction('applyFilter');
+            this.send('ready');
+        },
+        deleteFilter:function (name, value) {
+            this.send('loading');
+            this.sendAction('removeFilter', name, value);
             this.send('ready');
         }
     }
