@@ -2,7 +2,7 @@
 
     Ember.TEMPLATES['components/data-table'] = Ember.Handlebars.compile("<div  {{bind-attr class=cssClass}}>  </div>  <div class='table-component'>   <div class='topBox'>    <div class='searchBox'>     {{#if table.searchable}}     <span>Search :</span>{{input type='text' value=table.search}}<br/>     {{/if}}    </div>     <div class='perPage'>     <span>Rows :</span> {{view Ember.Select content=table.perPageSelector value=table.itemsPerPage}}    </div>     <div class='filter'>     {{#if table.availableFilters.length}}     <span>Filters :</span> {{view Ember.Select content=table.availableFilters value=table.filterName}}     {{input value=table.filterValue}} <a {{action 'addFilter'}} >Apply</a>     {{/if}}     {{#if table.appliedFilters.length}}     <span>Applied Filters</span>     {{#each filter in table.appliedFilters}}     <span>{{filter.name}}:{{filter.value}} <a {{action 'deleteFilter' filter.name filter.value}}> X </a> </span>     {{/each}}     {{/if}}    </div>    </div>   <div class='table'>    <table class='dataTable'>     <thead>     <tr>      {{#each header in table.headers}}      <th>       {{#if table.queryParamsEnabled}}       {{#link-to linkRouter (query-params page=1 sortBy=header.name order=header.order)       target='controller'}}{{header.name}}{{/link-to}}       {{else}}       <a href='' {{action 'getSortedContent' header.name}} >{{header.name}}</a></th>      {{/if}}      </th>      {{/each}}     </tr>     </thead>      <tbody>     {{#each table.paginatedContent }}     <tr>      <td>{{id}}</td>      <td>{{name}}</td>      <td>{{age}}</td>     </tr>     {{/each}}     </tbody>    </table>   </div>   <div class='paginator'>     {{#if table.queryParamsEnabled}}    <div class='previousPage'>{{#link-to linkRouter (query-params page=table.prevPage)     target='controller'}}Prev{{/link-to}}    </div>    {{else}}    <div class='previousPage'>{{#if table.prev}}<a href='' {{action getPreviousPage}}>prev</a>     {{else}}prev{{/if}}    </div>    {{/if}}     <div style='text-align: center;width: 50%;float: left;'>     <div class=' pageInfo    '>{{table.currentPage}} of {{table.availablePages}}     </div>    </div>    {{#if table.queryParamsEnabled}}    <div class='nextPage'>{{#link-to linkRouter (query-params page=table.nextPage)     target='controller'}}Next{{/link-to}}    </div>    {{else}}    <div class='nextPage'>{{#if table.next}}<a href=''{{action getNextPage}}>next</a>{{else}}next{{/if}}    </div>    {{/if}}   </div>  </div>");
 
-    var ColumnNamesMixin = Ember.Mixin.create({
+    Ember.ColumnNamesMixin = Ember.Mixin.create({
         properties:function () {
             var array = [];
             var content = this.toArray();
@@ -15,7 +15,7 @@
             return array;
         }.property('content')
     });
-    var PaginationMixin = Ember.Mixin.create({
+    Ember.PaginationMixin = Ember.Mixin.create({
         itemsPerPage:20,
         perPageSelector:[10, 20, 30, 40, 50],
         currentPage:1,
@@ -80,7 +80,8 @@
             }
         }
     });
-    Ember.DataTableMixin = Ember.Mixin.create(ColumnNamesMixin, Ember.SortableMixin, PaginationMixin, {
+
+    Ember.DataTableMixin = Ember.Mixin.create(Ember.ColumnNamesMixin, Ember.SortableMixin, Ember.PaginationMixin, {
         searchable:true,
         sortProperties:['id'],
         sortAscending:true,
@@ -98,7 +99,12 @@
                 var appliedFilters = this.get('appliedFilters');
                 var obj = {name:filterName, value:filterValue};
                 appliedFilters.pushObject(obj);
+                this.set('page', 1);
                 this.set('filterValue', '');
+                if (this.get('queryParamsEnabled')) {
+                    this.send('sendTransition');
+                    return;
+                }
             },
             removeFilter:function (name, value) {
                 var appliedFilters = this.get('appliedFilters');
@@ -108,7 +114,29 @@
                         newFilters.push({name:value.name, value:value.value});
                     }
                 });
+                this.set('page', 1);
                 this.set('appliedFilters', newFilters);
+                if (this.get('queryParamsEnabled')) {
+                    this.send('sendTransition');
+                    return;
+                }
+            },
+            sendTransition:function () {
+                var filterBy = [];
+                var appliedFilters = this.get('appliedFilters');
+                $.each(appliedFilters, function (key, value) {
+                    filterBy.push(value.name + "=" + value.value);
+                });
+                filterBy = filterBy.join(";");
+                if (this.get('queryParamsEnabled')) {
+                    if (filterBy.length) {
+                        this.transitionToRoute({queryParams:{filterBy:filterBy}});
+                        return;
+                    } else {
+                        this.transitionToRoute({queryParams:{filterBy:''}});
+                        return;
+                    }
+                }
             }
         },
         headers:function () {
@@ -173,7 +201,7 @@
                 return (valid > 0);
             });
             return filteredContent.toArray();
-        }.property('content', 'filterName', 'searchedContent'),
+        }.property('content', 'appliedFilters.length', 'searchedContent'),
         fullData:function () {
             return this.get('filteredContent');
         }.property('content', 'filteredContent'),
@@ -187,8 +215,24 @@
         orderObserver:function () {
             var order = this.get('order');
             this.set('sortAscending', (!Ember.isEmpty(order) ? order == 'asc' : true));
-        }.observes('order')
+        }.observes('order'),
+        filterByObserver:function () {
+            var appliedFilters = [];
+            var filterBy = this.get('filterBy');
+            if (filterBy.length > 0) {
+                filterBy = filterBy.split(";");
+                $.each(filterBy, function (key, value) {
+                    var filter = value.split("=");
+                    if (filter.length == 2) {
+                        appliedFilters.pushObject({name:filter[0], value:filter[1]});
+                    }
+                });
+            }
+            this.set('appliedFilters', appliedFilters);
+        }.observes('filterBy')
+
     });
+
     var DataTableComponent = Ember.Component.extend({
         init:function () {
             this._super();
@@ -248,4 +292,5 @@
             container.register('component:data-table', DataTableComponent);
         }
     });
-})();
+})
+    ();

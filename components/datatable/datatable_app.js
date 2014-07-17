@@ -28,6 +28,6 @@ App.ApplicationController=Ember.ArrayController.extend(Ember.DataTableMixin,{
       this._super();
         console.log(this);
     },
-    queryParams:['sortBy','order','search','page','itemsPerPage','id'],
+    queryParams:['sortBy','order','search','page','itemsPerPage','filterBy'],
     queryParamsEnabled:true
 });
