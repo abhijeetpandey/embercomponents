@@ -24,10 +24,6 @@ App.ApplicationRoute = Ember.Route.extend({
 });
 
 App.ApplicationController=Ember.ArrayController.extend(Ember.DataTableMixin,{
-    init:function(){
-      this._super();
-        console.log(this);
-    },
-    queryParams:['sortBy','order','search','page','itemsPerPage','filterBy'],
-    queryParamsEnabled:true
+//    queryParams:['sortBy','order','search','page','itemsPerPage','filterBy'],
+//    queryParamsEnabled:true
 });
