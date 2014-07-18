@@ -5,11 +5,11 @@
     Ember.DataTableRowView = Ember.View.extend({
         tagName:'tr',
         templateNameBinding:'getTemplateName',
-        getTemplateName:function(){
+        getTemplateName:function () {
             var rowTemplate = this.get('rowTemplate');
-            if(!Ember.isEmpty(rowTemplate) && rowTemplate.length>0){
+            if (!Ember.isEmpty(rowTemplate) && rowTemplate.length > 0) {
                 return rowTemplate;
-            }else{
+            } else {
                 return 'dataTableRow';
             }
         }.property('rowTemplate')
@@ -28,6 +28,7 @@
             return array;
         }.property('content')
     });
+
     Ember.PaginationMixin = Ember.Mixin.create({
         itemsPerPage:10,
         perPageSelector:[10, 20, 30, 40, 50],
@@ -209,7 +210,9 @@
             var sortedContent = this.get('sortedContent');
             searchedContent = $.grep(sortedContent, function (element, index) {
                 var valid = 0;
-                element = Ember.Object.create(element);
+                if (typeof element.get != "function") {
+                    element = Ember.Object.create(element);
+                }
                 $.each(properties, function (key, value) {
                     valid = valid || (element.get(value).toString().toLowerCase().indexOf(search.toLowerCase()) + 1);
                 });
@@ -223,7 +226,9 @@
             var appliedFilters = this.get('appliedFilters');
             filteredContent = $.grep(searchedContent.toArray(), function (element, index) {
                 var valid = 1;
-                element = Ember.Object.create(element);
+                if (typeof element.get != "function") {
+                    element = Ember.Object.create(element);
+                }
                 $.each(appliedFilters, function (key, value) {
                     valid = valid && (element.get(value.name).toString() == value.value.toString());
                 });
