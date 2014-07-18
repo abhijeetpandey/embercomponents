@@ -275,8 +275,13 @@
             this.set('propSort', 'propSort');
         },
         linkRouter:function () {
-            return this.get('table').get('currentRouteName');
-        }.property('table'),
+            //ref http://stackoverflow.com/questions/15019212/ember-app-router-router-currentstate-undefined/
+            var router = App.__container__.lookup("router:main"); //lookup the router
+            var currentHandlerInfos = router.router.currentHandlerInfos; //there are multiple handlers active at one time
+            var activeHandler = currentHandlerInfos[currentHandlerInfos.length - 1]; // the last item in the array is the current handler with properties like name, context, handler (Ember.Route)
+            var activeRoute = activeHandler.handler; //your route object
+            return activeRoute.get('routeName');
+        }.property(),
         cssClass:'',
         actions:{
             loading:function () {
