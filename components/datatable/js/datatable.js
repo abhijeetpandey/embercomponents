@@ -85,7 +85,7 @@
             var lowerBound = (currentPage * this.get('itemsPerPage')) - this.get('itemsPerPage');
             var models = this.get('fullData');
             return models.slice(lowerBound, upperBound);
-        }.property('content', 'currentPage', 'fullData.@each', 'itemsPerPage'),
+        }.property('content.length', 'currentPage', 'fullData.@each', 'itemsPerPage'),
         actions:{
             nextPage:function () {
                 if (this.get('currentPage') >= this.get('availablePages')) {
@@ -202,7 +202,7 @@
         }.property('properties'),
         sortedContent:function () {
             return this.toArray();
-        }.property('content', 'sortAscending', 'sortProperties'),
+        }.property('content.length', 'sortAscending', 'sortProperties'),
         searchedContent:function () {
             var searchedContent;
             var search = this.get('search').trim();
@@ -219,7 +219,7 @@
                 return (valid > 0);
             });
             return searchedContent.toArray();
-        }.property('content', 'search', 'sortedContent'),
+        }.property('content.length', 'search', 'sortedContent'),
         filteredContent:function () {
             var searchedContent = this.get('searchedContent');
             var filteredContent;
@@ -235,10 +235,10 @@
                 return (valid > 0);
             });
             return filteredContent.toArray();
-        }.property('content', 'appliedFilters.length', 'searchedContent'),
+        }.property('content.length', 'appliedFilters.length', 'searchedContent'),
         fullData:function () {
             return this.get('filteredContent');
-        }.property('content', 'filteredContent'),
+        }.property('content.length', 'filteredContent'),
         searchObserver:function () {
             this.set('page', 1);
         }.observes('search'),
