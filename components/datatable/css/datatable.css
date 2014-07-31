@@ -41,73 +41,6 @@
     overflow: scroll;
 }
 
-.table-component {
-    width: 98%;
-    margin: auto;
-}
-
-.topBox {
-    width: 912px;
-    margin: 0 auto 10px auto;
-    border: #b3b3b3 solid 1px;
-    background: #f1f1f1;
-    padding-top: 8px;
-    font-size: 12px;
-    height: 30px;
-}
-
-.searchBox {
-    float: left;
-}
-
-.searchBox>span, .perPage>span {
-    margin: 0 10px;
-}
-
-.searchBox>input {
-    width: 144px;
-    border: #b3b3b3 solid 1px;
-    height: 15px;
-    color: #666;
-    padding: 3px;
-}
-
-.perPage {
-    float: left;
-}
-
-.perPage>select {
-    width: 50px;
-    border: #b3b3b3 solid 1px;
-    height: 20px;
-    color: #666;
-}
-
-.dataTable {
-    width: 913px;
-    border: #E0E0E0 solid 1px;
-    border-collapse: collapse;
-}
-
-.dataTable>tbody>tr {
-    height: 40px;
-}
-
-.dataTable>thead>tr>th {
-    background: #6E9E90 !important;
-    color: #FFF;
-    font-weight: bold;
-    height: 20px;
-}
-
-.dataTable>thead>tr>th>a {
-    color: #FFF;
-}
-
-.dataTable>tbody>tr:nth-child(odd) {
-    background: #E0E0E0;
-}
-
 .paginator {
     width: 912px;
     margin: 10px auto 10px auto;
@@ -145,6 +78,206 @@
     color: red;
 }
 .table{
-    width: 912px;
+    width: 100%;
     margin: 0 auto 10px auto;
+}
+
+body {
+    width: 100%;
+    font-size: 13px;
+    line-height: 22px;
+    color: #666;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-bottom: 100px;
+}
+
+.table-component {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: auto;
+}
+
+.table {
+    /*border-left: #cececf solid 1px;*/
+    border-bottom: #cececf solid 1px;
+    height: auto;
+    margin: 0 auto 30px;
+}
+
+.dataTable {
+    width: 100%;
+    margin:auto;
+    border-collapse: collapse;
+}
+
+.dataTable>thead>tr>th {
+    background: #333;
+    /*border-right: #777 solid 1px;*/
+    text-align: center;
+    font-size: 13px;
+    color: #fff;
+    font-weight: bold;
+    padding: 3px 10px 0;
+    height: 35px;
+    width: auto;
+    white-space: nowrap;
+}
+
+.dataTable>tbody>tr>td {
+    /*border-right: #cececf solid 1px;*/
+    border-top: #cececf solid 1px;
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    padding: 3px 8px 0;
+    height: 35px;
+    width: auto;
+}
+
+.dataTable>tbody>tr:hover {
+    background: #dedede;
+}
+
+.dataTable>thead>tr>th>a {
+    color: #FFF;
+    text-decoration: none;
+}
+
+.topBox {
+    margin: 0 auto 10px;
+    height: 36px;
+    padding: 9px;
+    border: #cececf solid 1px;
+    background: #fff;
+}
+
+.topBox-item {
+    float: left;
+    width: auto;
+    height: 35px;
+    margin: 0 10px 0 0;
+}
+
+.inputBox {
+    height: 35px;
+    border: #cececf solid 1px;
+    background: #fafafa;
+}
+
+.inputBox-input-div {
+    float: left;
+    height: 33px;
+}
+
+.searchBox-input {
+    border: none;
+    font-weight: normal;
+    font-size: 13px !important;
+    color: #666 !important;
+    background: none;
+    height: 25px;
+    padding: 5px 5px 0 10px;
+    outline: none;
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+}
+
+.searchBox-icon {
+    float: right;
+    width: 20px;
+    height: 26px;
+    margin: 7px 7px 0;
+    background: url(../../../images/search-generic-icon.png) no-repeat;
+}
+
+.selectBox {
+    float: left;
+    width: 75px;
+    height: 35px;
+    border: #cececf solid 1px;
+    background: #fafafa;
+}
+
+.select {
+    border: none;
+    font-weight: normal;
+    font-size: 13px;
+    color: #666;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 70px;
+    height: 30px;
+    padding: 0 10px;
+    background: none
+}
+
+.input>div>input {
+    border: none;
+    font-weight: normal;
+    font-size: 13px !important;
+    color: #666 !important;
+    background: none;
+    height: 25px;
+    padding: 5px 5px 0 10px;
+    outline: none;
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+}
+
+.addButton-icon {
+    float: right;
+    width: 20px;
+    height: 26px;
+    margin: 7px 7px 0;
+    background: url(../../../images/add-generic-icon.png) no-repeat;
+}
+
+.tag-container {
+    margin: 0 auto 8px;
+    overflow: auto;
+    -webkit-animation: fadeOut 500ms;
+    -moz-animation: fadeOut 500ms;
+    animation: fadeOut 500ms;
+}
+
+.tag-box {
+    float: left;
+    height: 26px;
+    margin: 0 10px 6px 0;
+    padding: 0;
+    font-size: 12px;
+    color: #999;
+}
+
+.tag-text {
+    height: 24px;
+    float: left;
+    padding: 2px 5px 0;
+}
+
+.tag-remove-icon {
+    width: 24px;
+    height: 24px;
+    float: left;
+    padding: 1px 0 0;
+    background: url(../../../images/delete-small.png) no-repeat;
+}
+
+.sortIcon {
+    display: block;
+    padding: 4px;
+}
+
+.both {
+    background: url(../../../images/sort_both.png) no-repeat 95% 5px;
+}
+
+.active-asc {
+    background: url(../../../images/sort_asc.png) no-repeat 95% 5px;
+}
+
+.active-desc {
+    background: url(../../../images/sort_desc.png) no-repeat 95% 5px;
 }
