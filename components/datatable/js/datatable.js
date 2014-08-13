@@ -132,8 +132,9 @@
         }.property('filterName'),
         actions:{
             propSort:function (property) {
-                this.set('sortAscending', (this.sortProperties[0] === property ? !this.sortAscending : true));
-                this.set('sortProperties', [property]);
+                var order = this.get('order');
+                this.set('order',(this.sortProperties[0] === property ?((!Ember.isEmpty(order) ? ( order=='asc'?'desc':'asc') : 'desc')) : 'asc'));
+                this.set('sortBy',property);
                 this.set('currentPage', 1);
             },
             applyFilter:function () {
@@ -157,6 +158,9 @@
                 } else {
                     return;
                 }
+            },
+            deleteFilter:function(param){
+                this.send('removeFilter',param.name,param.value);
             },
             removeFilter:function (name, value) {
                 this.set('page', 1);
@@ -295,15 +299,7 @@
 
     });
 
-    var DataTableComponent = Ember.Component.extend({
-        init:function () {
-            this._super();
-            this.set('nextPage', 'nextPage');
-            this.set('previousPage', 'previousPage');
-            this.set('applyFilter', 'applyFilter');
-            this.set('removeFilter', 'removeFilter');
-            this.set('propSort', 'propSort');
-        },
+    var DataTableComponent = Ember.Component.extend(Ember.TargetActionSupport,{
         linkRouter:function () {
             //ref http://stackoverflow.com/questions/15019212/ember-app-router-router-currentstate-undefined/
             var router = App.__container__.lookup("router:main"); //lookup the router
@@ -326,28 +322,50 @@
             },
             getSortedContent:function (prop) {
                 this.send('loading');
-                this.sendAction('propSort', prop);
+                var parent = this;
+                this.triggerAction({
+                    action:'propSort',
+                    target:parent.get('table'),
+                    actionContext:prop
+                });
                 this.send('ready');
 
             },
             getNextPage:function () {
                 this.send('loading');
-                this.sendAction('nextPage');
+                var parent = this;
+                this.triggerAction({
+                    action:'nextPage',
+                    target:parent.get('table')
+                });
                 this.send('ready');
             },
             getPreviousPage:function () {
                 this.send('loading');
-                this.sendAction('previousPage');
+                var parent = this;
+                this.triggerAction({
+                    action:'previousPage',
+                    target:parent.get('table')
+                });
                 this.send('ready');
             },
             addFilter:function () {
                 this.send('loading');
-                this.sendAction('applyFilter');
+                var parent = this;
+                this.triggerAction({
+                    action:'applyFilter',
+                    target:parent.get('table')
+                });
                 this.send('ready');
             },
             deleteFilter:function (name, value) {
                 this.send('loading');
-                this.sendAction('removeFilter', name, value);
+                var parent = this;
+                this.triggerAction({
+                    action:'deleteFilter',
+                    target:parent.get('table'),
+                    actionContext:{name:name,value:value}
+                });
                 this.send('ready');
             }
         }
