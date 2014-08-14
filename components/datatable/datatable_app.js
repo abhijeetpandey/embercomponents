@@ -33,7 +33,8 @@ App.ApplicationRoute = Ember.Route.extend({
 
 App.ApplicationController=Ember.ArrayController.extend(Ember.DataTableMixin,{
     queryParams:['sortBy','order','search','page','itemsPerPage','filterBy'],
-    queryParamsEnabled:true,
+    headerAlias:Ember.Object.create({age:'Age',name:"User Name"}),
+    queryParamsEnabled:true
 //    pagination:false,
 //    itemsPerPage:100000
 });
