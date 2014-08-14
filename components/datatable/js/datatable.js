@@ -107,6 +107,7 @@
     });
 
     Ember.DataTableMixin = Ember.Mixin.create(Ember.ColumnNamesMixin, Ember.SortableMixin, Ember.PaginationMixin, {
+        headerAlias:null,
         searchable:true,
         filterable:true,
         sortProperties:['id'],
@@ -200,9 +201,16 @@
             var obj = [];
             var sortBy = this.get('sortBy');
             var order = this.get('order');
+            var headerAlias = this.get('headerAlias');
             $.each(properties, function (key, value) {
+
+                if(headerAlias)
+                {
+                    var header = headerAlias.hasOwnProperty(value)? headerAlias.get(value):false;
+                }
+
                 obj.push({
-                    header:value.replace(/_/g, ' ').capitalize(),
+                    header:header? header : value.replace(/_/g, ' ').capitalize(),
                     name:value,
                     order:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'desc' : 'asc') : 'asc') : 'asc') : 'asc'),
                     class:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'sortIcon active-asc' : 'sortIcon active-desc') : 'sortIcon both') : 'sortIcon both') : 'sortIcon both')});
