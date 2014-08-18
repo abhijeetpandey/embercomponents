@@ -116,14 +116,13 @@
         search:'',
         appliedFilters:[],
         autodata:function(){
-            var currentFilter=this.get('filterName');
+            var currentFilter=this.getPropertyFromAlias(this.get('filterName'));
             if(Ember.isEmpty(currentFilter))
                 return;
             var autodata=Ember.A();
             var data=Ember.A();
-            var parent=this;
             this.get('model').forEach(function(item){
-                data.push(Ember.Object.create(item).get(parent.get('filterName')));
+                data.push(Ember.Object.create(item).get(currentFilter));
             });
             data=data.uniq();
             data.forEach(function(item){
@@ -196,21 +195,46 @@
                 }
             }
         },
+        getPropertyAlias:function(value)
+        {
+            var headerAlias = this.get('headerAlias');
+            if(headerAlias)
+            {
+               headerAlias.hasOwnProperty(value)? headerAlias.get(value):headerAlias.set(value,value.replace(/_/g, ' ').capitalize());
+            }else{
+                headerAlias = Ember.Object.create();
+                headerAlias.set(value,value.replace(/_/g, ' ').capitalize());
+                this.set('headerAlias',headerAlias);
+            }
+
+            return headerAlias.get(value);
+        },
+        getPropertyFromAlias:function(alias)
+        {
+            var headerAlias = this.get('headerAlias');
+            if(headerAlias)
+            {
+                var header = false;
+                $.each(headerAlias,function(key,value)
+                {
+                    if(value == alias)
+                    {
+                        header = key;
+                        return;
+                    }
+                });
+            }
+            return header? header : alias;
+        },
         headers:function () {
             var properties = this.get('properties');
             var obj = [];
             var sortBy = this.get('sortBy');
             var order = this.get('order');
-            var headerAlias = this.get('headerAlias');
+            var parent = this;
             $.each(properties, function (key, value) {
-
-                if(headerAlias)
-                {
-                    var header = headerAlias.hasOwnProperty(value)? headerAlias.get(value):false;
-                }
-
                 obj.push({
-                    header:header? header : value.replace(/_/g, ' ').capitalize(),
+                    header:parent.getPropertyAlias(value),
                     name:value,
                     order:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'desc' : 'asc') : 'asc') : 'asc') : 'asc'),
                     class:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'sortIcon active-asc' : 'sortIcon active-desc') : 'sortIcon both') : 'sortIcon both') : 'sortIcon both')});
@@ -222,13 +246,14 @@
             var appliedFilters = this.get('appliedFilters');
             var columns = [];
             var availableFilters = [];
+            var parent = this;
             $.each(appliedFilters, function (key, value) {
                 columns.push(value.name);
             });
 
             $.each(filters, function (key, value) {
                 if ($.inArray(value, columns) == -1) {
-                    availableFilters.push(value);
+                    availableFilters.push(parent.getPropertyAlias(value));
                 }
             });
             this.set('filterName', availableFilters[0]);
@@ -261,13 +286,14 @@
             var searchedContent = this.get('searchedContent');
             var filteredContent;
             var appliedFilters = this.get('appliedFilters');
+            var parent=this;
             filteredContent = $.grep(searchedContent.toArray(), function (element, index) {
                 var valid = 1;
                 if (typeof element.get != "function") {
                     element = Ember.Object.create(element);
                 }
                 $.each(appliedFilters, function (key, value) {
-                    valid = valid && (element.get(value.name).toString() == value.value.toString());
+                    valid = valid && (element.get(parent.getPropertyFromAlias(value.name)).toString() == value.value.toString());
                 });
                 return (valid > 0);
             });
