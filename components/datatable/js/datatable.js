@@ -248,7 +248,7 @@
             var availableFilters = [];
             var parent = this;
             $.each(appliedFilters, function (key, value) {
-                columns.push(value.name);
+                columns.push(parent.getPropertyFromAlias(value.name));
             });
 
             $.each(filters, function (key, value) {
