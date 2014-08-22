@@ -268,16 +268,18 @@ body {
 .sortIcon {
     display: block;
     padding: 4px;
+    background-repeat: no-repeat !important;
+    background-size: 14px 22px !important;
 }
 
 .both {
-    background: url(../../../images/sort_both.png) no-repeat 95% 5px;
+    background: url(../../../images/sort_both.png);
 }
 
 .active-asc {
-    background: url(../../../images/sort_asc.png) no-repeat 95% 5px;
+    background: url(../../../images/sort_asc.png);
 }
 
 .active-desc {
-    background: url(../../../images/sort_desc.png) no-repeat 95% 5px;
+    background: url(../../../images/sort_desc.png);
 }
