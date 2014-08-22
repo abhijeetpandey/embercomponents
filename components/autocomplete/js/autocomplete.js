@@ -1,12 +1,13 @@
 (function () {
     Ember.TEMPLATES['defaultItemContainer'] = Ember.Handlebars.compile("{{text}}");
-    Ember.TEMPLATES['components/auto-complete'] = Ember.Handlebars.compile("<div id='cc-auto' >{{view textField placeholder=placeholder class=cssclass size=size maxlength=maxlength valueBinding='searchText'}}{{view UlView contextBinding='searchResults' index=currentIndex}}</div>");
+    Ember.TEMPLATES['components/auto-complete'] = Ember.Handlebars.compile("<div id='cc-auto' >{{view textField placeholder=placeholder class=cssclass size=size maxlength=maxlength valueBinding='searchText'}}{{#if ulVisible}}{{view UlView contextBinding='searchResults' index=currentIndex}}{{/if}}</div>");
     Ember.TEMPLATES['ulViewContainer'] = Ember.Handlebars.compile("{{#each item in this}}{{view view.parentView.ItemView contextBinding='item' currentIndex=view.parentView.currentIndex}}{{/each}}");
 
     var AutoCompleteComponent = Ember.Component.extend({
         cache:Ember.Map.create(),
         listItemContainer:"defaultItemContainer",
         localdata:[],
+        ulVisible:true,
         primaryText:"text",
         minLength:3,
         url:'',
@@ -22,7 +23,10 @@
         valueType:'text', //additional type  required from autocomplete,
         populateResults:true,
         focusOut:function (event) {
-            this.send('focusOut', event);
+            if(this.get('ulVisible'))
+            {
+                this.send('focusOut', event);
+            }
         },
         keyDown:function (event) {
             if (event.keyCode == 9) {
@@ -103,7 +107,7 @@
                 var items = [];
                 var url = this.get('url');
                 if (Ember.isEmpty(this.get('localdata'))) {
-                    items = this.get('cache').get(searchText);
+                    items = this.get('cache').get(url+searchText);
                     if (Ember.isEmpty(items)) {
                         $.ajax({
                             type:"GET",
@@ -111,7 +115,7 @@
                             async:true
                         }).done(function (data) {
                                 items = JSON.parse(data);
-                                parent.get('cache').set(searchText, items);
+                                parent.get('cache').set(url+searchText, items);
                                 parent.prepareSearchResults(items, parent);
                             });
                     } else {
