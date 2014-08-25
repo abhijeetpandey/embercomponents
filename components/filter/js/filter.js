@@ -47,6 +47,7 @@
         filterName:'',
         filterValue:'',
         searchFor:'search',
+        errorMsg:'',
         getInnerProperty:function (property, defaultValue) {
             var filterName = this.get('filterName');
             var filters = this.get('filters');
@@ -159,6 +160,7 @@
                                 appliedFilters.set(filterName, Ember.Object.create(filterData, {value:filterValue}));
                                 availableFilters.remove(filterName);
                             } else {
+                                this.set('errorMsg','Cannot Apply filter '+filterName+'. Please check value');
                                 console.log('Error ' + filterData.type + " " + filterValue);
                             }
                         }
