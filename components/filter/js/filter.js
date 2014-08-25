@@ -21,7 +21,7 @@
         "         <div class='topBox-item'>" +
         "             <div class='inputBox'>" +
         "                 <div class='inputBox-input-div'>" +
-        "                     {{auto-complete url=filterUrl class='input' minLength=1}}" +
+        "                     {{auto-complete url=filterUrl class='input' minLength=1 searchResults=searchResults ulVisible=false}}" +
         "                 </div>" +
         "             </div>" +
         "         </div>" +
@@ -161,7 +161,6 @@
                                 availableFilters.remove(filterName);
                             } else {
                                 this.set('errorMsg','Cannot Apply filter '+filterName+'. Please check value');
-                                console.log('Error ' + filterData.type + " " + filterValue);
                             }
                         }
                     }
