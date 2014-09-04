@@ -82,9 +82,7 @@
             return this.getInnerProperty('data', []);
         }.property('filterName', 'filters'),
         isAutoCompleteOn:function () {
-            var a = this.getInnerProperty('isAutoCompleteOn', true);
-            console.log(a);
-            return a;
+            return  this.getInnerProperty('isAutoCompleteOn', true);
         }.property('filterName', 'filters'),
         filterUrl:function () {
             return this.get('baseUrl') + this.get('flattenAppliedFilters');
