@@ -34,9 +34,9 @@ App.ApplicationRoute = Ember.Route.extend({
 App.ApplicationController=Ember.ObjectController.extend({
     appliedFilters:Ember.Map.create(),
     searchResults:[],
-    filters:Ember.A([{name:'age',type:'number',alias:'Age',url:"/tada/tada/"},
+    filters:Ember.A([{name:'age',type:'number',alias:'Age',url:"/tada/tada/",placeholder:"Enter Your Age"},
                      {name:'name',type:'string',alias:'Name',data:[{text:'Abhijeet'},{text:'Abhijeet Pandey'},{text:'Anup'}, {text:'Suraj'}]},
-                     {name:'rating',type:'range',alias:'Rating'}]),
+                     {name:'rating',type:'range',alias:'Rating', placeholder:'low::high', isAutoCompleteOn:false}]),
     appliedFiltersObserver:function(){
         console.log(this.get('appliedFilters'));
     }.observes('appliedFilters.length'),

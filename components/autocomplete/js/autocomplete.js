@@ -6,6 +6,7 @@
     var AutoCompleteComponent = Ember.Component.extend({
         cache:Ember.Map.create(),
         listItemContainer:"defaultItemContainer",
+        isAutoCompleteOn:true,
         localdata:[],
         ulVisible:true,
         primaryText:"text",
@@ -96,6 +97,11 @@
             return filteredContent.toArray();
         },
         searchTextObserver:function () {
+            if(!this.get('isAutoCompleteOn'))
+            {
+                return;
+            }
+
             if (!this.get('populateResults')) {
                 return;
             }

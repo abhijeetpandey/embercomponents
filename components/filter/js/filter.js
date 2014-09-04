@@ -12,7 +12,7 @@
         "         <div class='topBox-item'>" +
         "             <div class='inputBox'>" +
         "                 <div class='inputBox-input-div'>" +
-        "                     {{auto-complete localdata=data url=url qParam=qParam primaryText=primaryText listItemContainer=listItemContainer searchText=filterValue class='input' minLength=1}}" +
+        "                     {{auto-complete isAutoCompleteOn=isAutoCompleteOn localdata=data url=url qParam=qParam primaryText=primaryText placeholder=placeholder listItemContainer=listItemContainer searchText=filterValue class='input' minLength=1}}" +
         "                 </div>" +
         "             </div>" +
         "         </div>" +
@@ -61,11 +61,10 @@
                     }
                 }
             });
-
-            return ret ? ret : defaultValue;
+            return !Ember.isEmpty(ret) ? ret : defaultValue;
         },
         primaryText:function () {
-            return this.getInnerProperty('primaryText', 'text');
+            return this.getInnerProperty('primaryText', this.get('text'));
         }.property('filterName', 'filters'),
         listItemContainer:function () {
             return this.getInnerProperty('listItemContainer', 'defaultItemContainer');
@@ -76,8 +75,16 @@
         qParam:function () {
             return this.getInnerProperty('qParam', null);
         }.property('filterName', 'filters'),
+        placeholder:function () {
+            return this.getInnerProperty('placeholder', this.get('primaryText'));
+        }.property('filterName', 'filters'),
         data:function () {
             return this.getInnerProperty('data', []);
+        }.property('filterName', 'filters'),
+        isAutoCompleteOn:function () {
+            var a = this.getInnerProperty('isAutoCompleteOn', true);
+            console.log(a);
+            return a;
         }.property('filterName', 'filters'),
         filterUrl:function () {
             return this.get('baseUrl') + this.get('flattenAppliedFilters');
