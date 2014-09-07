@@ -2,9 +2,9 @@
     Ember.TEMPLATES['dataTableRow'] = Ember.Handlebars.compile("<td>{{id}}</td><td>{{name}}</td><td>{{age}}</td>");
     Ember.TEMPLATES['components/data-table'] = Ember.Handlebars.compile("<div {{bind-attr class=cssClass}}>  </div> <div class='table-component'>     <div class='topBox'>         <!--search box-->         {{#if table.searchable}}         <div class='topBox-item'>             <div class='inputBox search'>                 <div class='inputBox-input-div'>                     {{input type='text' value=table.search class='searchBox-input'}}                 </div>                 <div class='searchBox-icon'></div>             </div>         </div>         {{/if}}          {{#if table.pagination}}         <div class='topBox-item'>             <div class='selectBox'>                 {{view Ember.Select content=table.perPageSelector value=table.itemsPerPage class='select'}}             </div>         </div>         {{/if}}          {{#if table.filterable}}         {{#if table.availableFilters.length}}         <div class='topBox-item'>             <div class='selectBox'>                 {{view Ember.Select content=table.availableFilters value=table.filterName class='select'}}             </div>         </div>          <div class='topBox-item'>             <div class='inputBox'>                 <div class='inputBox-input-div'>                     {{auto-complete localdata=table.autodata searchText=table.filterValue class='input'}}                 </div>          </div>         </div>          <a {{action 'addFilter'}}>        <div class='addButton-icon'></div>         </a>         {{/if}}         {{/if}}     </div>       {{#if table.appliedFilters.length}}     <div class='tag-container'>         {{#each filter in table.appliedFilters}}         <div class='tag-box'>             <div class='tag-text'>{{filter.name}}:{{filter.value}}</div>      <a {{action 'deleteFilter' filter.name filter.value}}><div class='tag-remove-icon'></div></a>         </div>         {{/each}}     </div>     {{/if}}      <div class='table'>         <table class='dataTable'>             <thead>             <tr>                 {{#each header in table.headers}}                 <th >                     {{#if table.queryParamsEnabled}} {{#link-to linkRouter (query-params page=1 sortBy=header.name  order=header.order)  target='controller'}}<div {{bind-attr class=header.class}}>{{header.header}}</div>{{/link-to}}                     {{else}} <a {{action 'getSortedContent' header.name}} ><div {{bind-attr class=header.class}}>{{header.header}}</div></a>                     {{/if}}                 </th>                 {{/each}}             </tr>             </thead>             <tbody>             {{#each row in table.paginatedContent }}             {{view Ember.DataTableRowView contextBinding='row' rowTemplate=table.rowTemplate table=table}}             {{/each}}             </tbody>         </table>     </div>      {{#if table.pagination}}     <div class='paginator'> {{#if table.queryParamsEnabled}}         <div class='previousPage'>{{#link-to linkRouter (query-params page=table.prevPage)             target='controller'}}Prev{{/link-to}}         </div>         {{else}}         <div class='previousPage'>{{#if table.prev}}<a href='' {{action getPreviousPage}}>prev</a>             {{else}}prev{{/if}}         </div>         {{/if}}         <div style='text-align: center;width: 50%;float: left;'>             <div class=' pageInfo    '>{{table.currentPage}} of {{table.availablePages}}</div>         </div>         {{#if table.queryParamsEnabled}}         <div class='nextPage'>{{#link-to linkRouter (query-params page=table.nextPage)             target='controller'}}Next{{/link-to}}         </div>         {{else}}         <div class='nextPage'>{{#if table.next}}<a href=''{{action getNextPage}}>next</a>{{else}}next{{/if}}</div>         {{/if}}     </div>     {{/if}} </div>");
 
-    String.prototype.capitalize = function() {
+    String.prototype.capitalize = function () {
         return this.charAt(0).toUpperCase() + this.slice(1);
-    }
+    };
 
     Ember.DataTableRowView = Ember.View.extend({
         tagName:'tr',
@@ -115,17 +115,17 @@
         pagination:true,
         search:'',
         appliedFilters:[],
-        autodata:function(){
-            var currentFilter=this.getPropertyFromAlias(this.get('filterName'));
-            if(Ember.isEmpty(currentFilter))
+        autodata:function () {
+            var currentFilter = this.getPropertyFromAlias(this.get('filterName'));
+            if (Ember.isEmpty(currentFilter))
                 return;
-            var autodata=Ember.A();
-            var data=Ember.A();
-            this.get('model').forEach(function(item){
+            var autodata = Ember.A();
+            var data = Ember.A();
+            this.get('model').forEach(function (item) {
                 data.push(Ember.Object.create(item).get(currentFilter));
             });
-            data=data.uniq();
-            data.forEach(function(item){
+            data = data.uniq();
+            data.forEach(function (item) {
                 autodata.push({text:item});
             });
             return autodata;
@@ -133,8 +133,8 @@
         actions:{
             propSort:function (property) {
                 var order = this.get('order');
-                this.set('order',(this.sortProperties[0] === property ?((!Ember.isEmpty(order) ? ( order=='asc'?'desc':'asc') : 'desc')) : 'asc'));
-                this.set('sortBy',property);
+                this.set('order', (this.sortProperties[0] === property ? ((!Ember.isEmpty(order) ? ( order == 'asc' ? 'desc' : 'asc') : 'desc')) : 'asc'));
+                this.set('sortBy', property);
                 this.set('currentPage', 1);
             },
             applyFilter:function () {
@@ -159,8 +159,8 @@
                     return;
                 }
             },
-            deleteFilter:function(param){
-                this.send('removeFilter',param.name,param.value);
+            deleteFilter:function (param) {
+                this.send('removeFilter', param.name, param.value);
             },
             removeFilter:function (name, value) {
                 this.set('page', 1);
@@ -195,36 +195,30 @@
                 }
             }
         },
-        getPropertyAlias:function(value)
-        {
+        getPropertyAlias:function (value) {
             var headerAlias = this.get('headerAlias');
-            if(headerAlias)
-            {
-               headerAlias.hasOwnProperty(value)? headerAlias.get(value):headerAlias.set(value,value.replace(/_/g, ' ').capitalize());
-            }else{
+            if (headerAlias) {
+                headerAlias.hasOwnProperty(value) ? headerAlias.get(value) : headerAlias.set(value, value.replace(/_/g, ' ').capitalize());
+            } else {
                 headerAlias = Ember.Object.create();
-                headerAlias.set(value,value.replace(/_/g, ' ').capitalize());
-                this.set('headerAlias',headerAlias);
+                headerAlias.set(value, value.replace(/_/g, ' ').capitalize());
+                this.set('headerAlias', headerAlias);
             }
 
             return headerAlias.get(value);
         },
-        getPropertyFromAlias:function(alias)
-        {
+        getPropertyFromAlias:function (alias) {
             var headerAlias = this.get('headerAlias');
-            if(headerAlias)
-            {
+            if (headerAlias) {
                 var header = false;
-                $.each(headerAlias,function(key,value)
-                {
-                    if(value == alias)
-                    {
+                $.each(headerAlias, function (key, value) {
+                    if (value == alias) {
                         header = key;
                         return;
                     }
                 });
             }
-            return header? header : alias;
+            return header ? header : alias;
         },
         headers:function () {
             var properties = this.get('properties');
@@ -286,14 +280,18 @@
             var searchedContent = this.get('searchedContent');
             var filteredContent;
             var appliedFilters = this.get('appliedFilters');
-            var parent=this;
+            var properties = this.get('properties');
+            var parent = this;
             filteredContent = $.grep(searchedContent.toArray(), function (element, index) {
                 var valid = 1;
                 if (typeof element.get != "function") {
                     element = Ember.Object.create(element);
                 }
+
                 $.each(appliedFilters, function (key, value) {
-                    valid = valid && (element.get(parent.getPropertyFromAlias(value.name)).toString() == value.value.toString());
+                    if (properties.indexOf(parent.getPropertyFromAlias(value.name)) > 0) {
+                        valid = valid && (element.get(parent.getPropertyFromAlias(value.name)).toString() == value.value.toString());
+                    }
                 });
                 return (valid > 0);
             });
@@ -333,7 +331,7 @@
 
     });
 
-    var DataTableComponent = Ember.Component.extend(Ember.TargetActionSupport,{
+    var DataTableComponent = Ember.Component.extend(Ember.TargetActionSupport, {
         linkRouter:function () {
             //ref http://stackoverflow.com/questions/15019212/ember-app-router-router-currentstate-undefined/
             var router = App.__container__.lookup("router:main"); //lookup the router
@@ -398,7 +396,7 @@
                 this.triggerAction({
                     action:'deleteFilter',
                     target:parent.get('table'),
-                    actionContext:{name:name,value:value}
+                    actionContext:{name:name, value:value}
                 });
                 this.send('ready');
             }
