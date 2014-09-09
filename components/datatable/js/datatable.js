@@ -113,8 +113,11 @@
         sortProperties:['id'],
         sortAscending:true,
         pagination:true,
+        hidden:[],
         search:'',
         appliedFilters:[],
+        propertyAliasMap:Ember.Map.create(),
+        aliasPropertyMap:Ember.Map.create(),
         autodata:function () {
             var currentFilter = this.getPropertyFromAlias(this.get('filterName'));
             if (Ember.isEmpty(currentFilter))
@@ -196,29 +199,43 @@
             }
         },
         getPropertyAlias:function (value) {
-            var headerAlias = this.get('headerAlias');
-            if (headerAlias) {
-                headerAlias.hasOwnProperty(value) ? headerAlias.get(value) : headerAlias.set(value, value.replace(/_/g, ' ').capitalize());
-            } else {
-                headerAlias = Ember.Object.create();
-                headerAlias.set(value, value.replace(/_/g, ' ').capitalize());
-                this.set('headerAlias', headerAlias);
+            var map = this.get('aliasPropertyMap');
+            if (map.has(value)) {
+                return map.get(value);
             }
-
-            return headerAlias.get(value);
+            this.generateMap(map, false);
+            return map.get(value);
         },
         getPropertyFromAlias:function (alias) {
-            var headerAlias = this.get('headerAlias');
-            if (headerAlias) {
-                var header = false;
-                $.each(headerAlias, function (key, value) {
-                    if (value == alias) {
-                        header = key;
-                        return;
-                    }
-                });
+            var map = this.get('propertyAliasMap');
+            if (map.has(alias)) {
+                return map.get(alias);
             }
-            return header ? header : alias;
+            this.generateMap(map, true);
+            return map.get(alias);
+        },
+        generateMap:function (map, flip) {
+            var headerAlias = this.get('headerAlias');
+            var properties = this.get('properties');
+            var filters = this.get('filters');
+
+            $.each(properties, function (key, value) {
+                var v1 = flip ? value.replace(/_/g, ' ').capitalize() : value;
+                var v2 = flip ? value : value.replace(/_/g, ' ').capitalize();
+                if (headerAlias.hasOwnProperty(value)) {
+                    map.set(v1, v2);
+                } else {
+                    map.set(v1, v2);
+                }
+            });
+
+            $.each(filters, function (key, value) {
+                var v1 = flip ? value.replace(/_/g, ' ').capitalize() : value;
+                var v2 = flip ? value : value.replace(/_/g, ' ').capitalize();
+                if (!map.has(value)) {
+                    map.set(v1, v2);
+                }
+            });
         },
         headers:function () {
             var properties = this.get('properties');
@@ -226,12 +243,15 @@
             var sortBy = this.get('sortBy');
             var order = this.get('order');
             var parent = this;
+            var hiddenProperties = this.get('hidden');
             $.each(properties, function (key, value) {
-                obj.push({
-                    header:parent.getPropertyAlias(value),
-                    name:value,
-                    order:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'desc' : 'asc') : 'asc') : 'asc') : 'asc'),
-                    class:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'sortIcon active-asc' : 'sortIcon active-desc') : 'sortIcon both') : 'sortIcon both') : 'sortIcon both')});
+                if ($.inArray(value, hiddenProperties)) {
+                    obj.push({
+                        header:parent.getPropertyAlias(value),
+                        name:value,
+                        order:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'desc' : 'asc') : 'asc') : 'asc') : 'asc'),
+                        class:(!Ember.isEmpty(sortBy) ? (sortBy == value ? (!Ember.isEmpty(order) ? (order == 'asc' ? 'sortIcon active-asc' : 'sortIcon active-desc') : 'sortIcon both') : 'sortIcon both') : 'sortIcon both')});
+                }
             });
             return obj;
         }.property('properties', 'sortBy', 'order'),
@@ -244,7 +264,6 @@
             $.each(appliedFilters, function (key, value) {
                 columns.push(parent.getPropertyFromAlias(value.name));
             });
-
             $.each(filters, function (key, value) {
                 if ($.inArray(value, columns) == -1) {
                     availableFilters.push(parent.getPropertyAlias(value));
@@ -289,8 +308,9 @@
                 }
 
                 $.each(appliedFilters, function (key, value) {
-                    if (properties.indexOf(parent.getPropertyFromAlias(value.name)) > 0) {
-                        valid = valid && (element.get(parent.getPropertyFromAlias(value.name)).toString() == value.value.toString());
+                    var propertyFromAlias = parent.getPropertyFromAlias(value.name);
+                    if (properties.indexOf(propertyFromAlias) > 0) {
+                        valid = valid && (element.get(propertyFromAlias).toString() == value.value.toString());
                     }
                 });
                 return (valid > 0);
