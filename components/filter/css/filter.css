@@ -4,7 +4,7 @@
 }
 
 .filter{
-    width: 40%;
+    width: 45%;
     margin: auto;
 }
 
@@ -17,17 +17,18 @@ body {
 }
 
 .topBox {
-    margin: 0 auto 10px;
-    height: 36px;
-    padding: 9px;
-    border: #cececf solid 1px;
+    /*margin: 0 auto 10px;*/
+    height: auto;
+    /*border: #cececf solid 1px;*/
     background: #fff;
+    overflow:auto;
+    margin: 10px 0 10px 0;
 }
 
 .topBox-item {
     float: left;
     width: auto;
-    height: 35px;
+    height: auto;
     margin: 0 10px 0 0;
 }
 
@@ -136,4 +137,24 @@ body {
     float: left;
     padding: 1px 0 0;
     background: url(../../../images/delete-small.png) no-repeat;
+}
+
+.ns-button {
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 1px 15px;
+    font-size: 12px;
+    font-weight: bold;
+    height: 37px;
+    width: 100px;
+    color: #eee;
+    background-color: #333;
+    outline: none ;
+}
+
+.ns-button:hover{
+    background: #666;
 }

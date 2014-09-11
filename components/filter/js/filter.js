@@ -16,7 +16,7 @@
         "                 </div>" +
         "             </div>" +
         "         </div>" +
-        "         <a {{action 'applyFilter'}}><div class='addButton-icon'></div></a>" +
+        "         <div class='topBox-item'><button class='ns-button' {{action 'applyFilter'}}>Apply</a></div>" +
         "         {{/if}}" +
         "         <div class='topBox-item'>" +
         "             <div class='inputBox'>" +
@@ -64,7 +64,7 @@
             return !Ember.isEmpty(ret) ? ret : defaultValue;
         },
         primaryText:function () {
-            return this.getInnerProperty('primaryText', this.get('text'));
+            return this.getInnerProperty('primaryText', 'text');
         }.property('filterName', 'filters'),
         listItemContainer:function () {
             return this.getInnerProperty('listItemContainer', 'defaultItemContainer');
