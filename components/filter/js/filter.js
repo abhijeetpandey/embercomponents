@@ -120,9 +120,13 @@
         appliedFilters:Ember.Map.create(),
         filtersObserver:function () {
             var filters = this.get('filters');
-            var map = this.get('availableFilters');
+            var availableFilters = this.get('availableFilters');
+            var appliedFilters = this.get('appliedFilters');
             $.each(filters, function (key, value) {
-                map.set(value.alias, value);
+                if(!appliedFilters.has(value.alias))
+                {
+                    availableFilters.set(value.alias, value);
+                }
             });
         }.observes('filters.length').on('didInsertElement'),
         validateFilterData:function (filterValue, filterType) {
