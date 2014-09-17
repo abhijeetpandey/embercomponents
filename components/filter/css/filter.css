@@ -18,8 +18,8 @@ body {
 
 .topBox {
     /*margin: 0 auto 10px;*/
-    height: auto;
-    /*border: #cececf solid 1px;*/
+    height: 50px;
+
     background: #fff;
     overflow:auto;
     margin: 10px 0 10px 0;
@@ -29,12 +29,10 @@ body {
     float: left;
     width: auto;
     height: auto;
-    margin: 0 10px 0 0;
+    margin: 3px 10px 0 0;
 }
 
 .inputBox {
-    height: 35px;
-    border: #cececf solid 1px;
     background: #fafafa;
 }
 
@@ -85,18 +83,30 @@ body {
     background: none
 }
 
+
+#cc-auto{
+    height: 35px;
+}
+
 .input>div>input {
     border: none;
     font-weight: normal;
     font-size: 13px !important;
     color: #666 !important;
     background: none;
-    height: 25px;
-    padding: 5px 5px 0 10px;
+    height: 100%;
+    padding: 0px 5px 0 10px;
     outline: none;
     transition: all 0.25s ease-in-out;
     -webkit-transition: all 0.25s ease-in-out;
     -moz-transition: all 0.25s ease-in-out;
+    border: #cececf solid 1px;
+}
+
+.input>div>input:focus {
+    box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
 }
 
 .addButton-icon {
