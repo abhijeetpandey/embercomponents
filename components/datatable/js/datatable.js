@@ -1,3 +1,4 @@
+//TODO:Add error handling from smooth operation
 (function () {
     Ember.TEMPLATES['dataTableRow'] = Ember.Handlebars.compile("<td>{{id}}</td><td>{{name}}</td><td>{{age}}</td>");
     Ember.TEMPLATES['components/data-table'] = Ember.Handlebars.compile("<div {{bind-attr class=cssClass}}>  </div> <div class='table-component'>     <div class='topBox'>         <!--search box-->         {{#if table.searchable}}         <div class='topBox-item'>             <div class='inputBox search'>                 <div class='inputBox-input-div'>                     {{input type='text' value=table.search class='searchBox-input'}}                 </div>                 <div class='searchBox-icon'></div>             </div>         </div>         {{/if}}          {{#if table.pagination}}         <div class='topBox-item'>             <div class='selectBox'>                 {{view Ember.Select content=table.perPageSelector value=table.itemsPerPage class='select'}}             </div>         </div>         {{/if}}          {{#if table.filterable}}         {{#if table.availableFilters.length}}         <div class='topBox-item'>             <div class='selectBox'>                 {{view Ember.Select content=table.availableFilters value=table.filterName class='select'}}             </div>         </div>          <div class='topBox-item'>             <div class='inputBox'>                 <div class='inputBox-input-div'>                     {{auto-complete localdata=table.autodata searchText=table.filterValue class='input'}}                 </div>          </div>         </div>          <a {{action 'addFilter'}}>        <div class='addButton-icon'></div>         </a>         {{/if}}         {{/if}}     </div>       {{#if table.appliedFilters.length}}     <div class='tag-container'>         {{#each filter in table.appliedFilters}}         <div class='tag-box'>             <div class='tag-text'>{{filter.name}}:{{filter.value}}</div>      <a {{action 'deleteFilter' filter.name filter.value}}><div class='tag-remove-icon'></div></a>         </div>         {{/each}}     </div>     {{/if}}      <div class='table'>         <table class='dataTable'>             <thead>             <tr>                 {{#each header in table.headers}}                 <th >                     {{#if table.queryParamsEnabled}} {{#link-to linkRouter (query-params page=1 sortBy=header.name  order=header.order)  target='controller'}}<div {{bind-attr class=header.class}}>{{header.header}}</div>{{/link-to}}                     {{else}} <a {{action 'getSortedContent' header.name}} ><div {{bind-attr class=header.class}}>{{header.header}}</div></a>                     {{/if}}                 </th>                 {{/each}}             </tr>             </thead>             <tbody>             {{#each row in table.paginatedContent }}             {{view Ember.DataTableRowView contextBinding='row' rowTemplate=table.rowTemplate table=table}}             {{/each}}             </tbody>         </table>     </div>      {{#if table.pagination}}     <div class='paginator'> {{#if table.queryParamsEnabled}}         <div class='previousPage'>{{#link-to linkRouter (query-params page=table.prevPage)             target='controller'}}Prev{{/link-to}}         </div>         {{else}}         <div class='previousPage'>{{#if table.prev}}<a href='' {{action getPreviousPage}}>prev</a>             {{else}}prev{{/if}}         </div>         {{/if}}         <div style='text-align: center;width: 50%;float: left;'>             <div class=' pageInfo    '>{{table.currentPage}} of {{table.availablePages}}</div>         </div>         {{#if table.queryParamsEnabled}}         <div class='nextPage'>{{#link-to linkRouter (query-params page=table.nextPage)             target='controller'}}Next{{/link-to}}         </div>         {{else}}         <div class='nextPage'>{{#if table.next}}<a href=''{{action getNextPage}}>next</a>{{else}}next{{/if}}</div>         {{/if}}     </div>     {{/if}} </div>");
@@ -116,6 +117,7 @@
         hidden:[],
         search:'',
         appliedFilters:[],
+        propertiesToSearch:[],
         propertyAliasMap:Ember.Map.create(),
         aliasPropertyMap:Ember.Map.create(),
         autodata:function () {
@@ -222,7 +224,7 @@
                 var v1 = flip ? value.replace(/_/g, ' ').capitalize() : value;
                 var v2 = flip ? value : value.replace(/_/g, ' ').capitalize();
                 if (headerAlias.hasOwnProperty(value)) {
-                    flip?map.set(headerAlias.get(value),value):map.set(value,headerAlias.get(value));
+                    flip ? map.set(headerAlias.get(value), value) : map.set(value, headerAlias.get(value));
                 } else {
                     map.set(v1, v2);
                 }
@@ -232,15 +234,20 @@
                 var v1 = flip ? value.replace(/_/g, ' ').capitalize() : value;
                 var v2 = flip ? value : value.replace(/_/g, ' ').capitalize();
                 var present = false;
-                map.forEach(function(key,value){
-                    if(value == v2)
-                    {
-                        present = true;
+                if (flip) {
+                    map.forEach(function (key, value) {
+                        if (value == v2) {
+                            present = true;
+                            return;
+                        }
+                    });
+                    if (!present) {
+                        map.set(v1, v2);
                     }
-                });
-
-                if (!present) {
-                    map.set(v1, v2);
+                } else {
+                    if (!map.has(value)) {
+                        map.set(v1, v2);
+                    }
                 }
             });
         },
@@ -288,7 +295,7 @@
         searchedContent:function () {
             var searchedContent;
             var search = this.get('search').trim();
-            var properties = this.get('properties');
+            var properties = Ember.isEmpty(this.get('propertiesToSearch')) ? this.get('properties') : this.get('propertiesToSearch');
             var sortedContent = this.get('sortedContent');
             searchedContent = $.grep(sortedContent, function (element, index) {
                 var valid = 0;
