@@ -218,12 +218,11 @@
             var headerAlias = this.get('headerAlias');
             var properties = this.get('properties');
             var filters = this.get('filters');
-
             $.each(properties, function (key, value) {
                 var v1 = flip ? value.replace(/_/g, ' ').capitalize() : value;
                 var v2 = flip ? value : value.replace(/_/g, ' ').capitalize();
                 if (headerAlias.hasOwnProperty(value)) {
-                    map.set(v1, v2);
+                    flip?map.set(headerAlias.get(value),value):map.set(value,headerAlias.get(value));
                 } else {
                     map.set(v1, v2);
                 }
@@ -232,7 +231,15 @@
             $.each(filters, function (key, value) {
                 var v1 = flip ? value.replace(/_/g, ' ').capitalize() : value;
                 var v2 = flip ? value : value.replace(/_/g, ' ').capitalize();
-                if (!map.has(value)) {
+                var present = false;
+                map.forEach(function(key,value){
+                    if(value == v2)
+                    {
+                        present = true;
+                    }
+                });
+
+                if (!present) {
                     map.set(v1, v2);
                 }
             });
