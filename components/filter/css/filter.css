@@ -63,27 +63,6 @@ body {
     background: url(../../../images/search-generic-icon.png) no-repeat;
 }
 
-.selectBox {
-    float: left;
-    width: 75px;
-    height: 35px;
-    border: #cececf solid 1px;
-    background: #fafafa;
-}
-
-.select {
-    border: none;
-    font-weight: normal;
-    font-size: 13px;
-    color: #666;
-    font-family: Arial, Helvetica, sans-serif;
-    width: 70px;
-    height: 30px;
-    padding: 0 10px;
-    background: none
-}
-
-
 #cc-auto{
     height: 35px;
 }
@@ -149,6 +128,81 @@ body {
     background: url(../../../images/delete-small.png) no-repeat;
 }
 
+
+.selectBox {
+    float: left;
+}
+
+.select {
+    border: none;
+    font-weight: normal;
+    font-size: 13px;
+    color: #666;
+    font-family: Arial, Helvetica, sans-serif;
+    width: auto;
+    height: 37px;
+    padding: 0 22px 0 10px;
+    background: none;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: #cececf solid 1px;
+    border-radius: 0;
+    cursor: pointer;
+    background: #fafafa;
+}
+
+.select:focus {
+    box-shadow  : 0 0 5px rgba(0, 143, 255, 1);
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+}
+
+.selectLabel{
+    position: relative;
+}
+
+.selectLabel:before {
+    content: '';
+    right: 6px;
+    top: 0px;
+    width: 20px;
+    height: 20px;
+    /* background: #f8f8f8; */
+    position: absolute;
+    pointer-events: none;
+    display: block;
+}
+
+.selectLabel:after {
+    content: '<>';
+    font: 12px "Consolas", monospace;
+    color: #aaa;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    right: 10px;
+    top: 0px;
+    padding: 0 0 1px;
+    /* border-bottom: 1px solid #ddd; */
+    position: absolute;
+    pointer-events: none;
+}
+
+.filter>.topBox {
+    margin: 0 auto;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: #fff;
+}
+
+.filter>.topBox>.topBox-item>.ns-button {
+    height: 37px;
+}
+
 .ns-button {
     display: inline-block;
     text-align: center;
@@ -167,4 +221,11 @@ body {
 
 .ns-button:hover{
     background: #666;
+}
+
+.ns-button:focus{
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
 }

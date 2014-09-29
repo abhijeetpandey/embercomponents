@@ -6,7 +6,9 @@
         "         {{#if availableFiltersName.length}}" +
         "         <div class='topBox-item'>" +
         "             <div class='selectBox'>" +
+        "                  <label class='selectLabel'>" +
         "                 {{view Ember.Select content=availableFiltersName value=filterName class='select'}}" +
+        "                  </label>" +
         "             </div>" +
         "         </div>" +
         "         <div class='topBox-item'>" +
