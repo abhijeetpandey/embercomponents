@@ -86,6 +86,7 @@ body {
     box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    border: 1px solid rgba(63, 171, 255, 0.77);
 }
 
 .addButton-icon {
@@ -131,6 +132,9 @@ body {
 
 .selectBox {
     float: left;
+    height: 35px;
+    border: #cececf solid 1px;
+    background: #fafafa;
 }
 
 .select {
@@ -139,56 +143,17 @@ body {
     font-size: 13px;
     color: #666;
     font-family: Arial, Helvetica, sans-serif;
-    width: auto;
-    height: 37px;
-    padding: 0 22px 0 10px;
+    height: 35px;
+    padding: 0 10px;
     background: none;
+    width: 100%;
     outline: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border: #cececf solid 1px;
-    border-radius: 0;
-    cursor: pointer;
-    background: #fafafa;
 }
 
 .select:focus {
-    box-shadow  : 0 0 5px rgba(0, 143, 255, 1);
+    box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
-    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
-}
-
-.selectLabel{
-    position: relative;
-}
-
-.selectLabel:before {
-    content: '';
-    right: 6px;
-    top: 0px;
-    width: 20px;
-    height: 20px;
-    /* background: #f8f8f8; */
-    position: absolute;
-    pointer-events: none;
-    display: block;
-}
-
-.selectLabel:after {
-    content: '<>';
-    font: 12px "Consolas", monospace;
-    color: #aaa;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    transform: rotate(90deg);
-    right: 10px;
-    top: 0px;
-    padding: 0 0 1px;
-    /* border-bottom: 1px solid #ddd; */
-    position: absolute;
-    pointer-events: none;
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1)
 }
 
 .filter>.topBox {
@@ -228,4 +193,5 @@ body {
     box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    border: 1px solid rgba(63, 171, 255, 0.77);
 }

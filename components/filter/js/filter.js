@@ -6,9 +6,7 @@
         "         {{#if availableFiltersName.length}}" +
         "         <div class='topBox-item'>" +
         "             <div class='selectBox'>" +
-        "                  <label class='selectLabel'>" +
         "                 {{view Ember.Select content=availableFiltersName value=filterName class='select'}}" +
-        "                  </label>" +
         "             </div>" +
         "         </div>" +
         "         <div class='topBox-item'>" +
@@ -18,7 +16,7 @@
         "                 </div>" +
         "             </div>" +
         "         </div>" +
-        "         <div class='topBox-item'><button class='ns-button' {{action 'applyFilter'}}>Apply</a></div>" +
+        "         <div class='topBox-item'><button class='ns-button' {{action 'applyFilter'}}>Apply</button></div>" +
         "         {{/if}}" +
         "         <div class='topBox-item'>" +
         "             <div class='inputBox'>" +

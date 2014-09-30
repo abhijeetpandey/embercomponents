@@ -77,7 +77,8 @@
 .red {
     color: red;
 }
-.table{
+
+.table {
     width: 100%;
     margin: 0 auto 10px auto;
 }
@@ -107,7 +108,7 @@ body {
 
 .dataTable {
     width: 100%;
-    margin:auto;
+    margin: auto;
     border-collapse: collapse;
 }
 
@@ -159,12 +160,6 @@ body {
     margin: 0 10px 0 0;
 }
 
-.inputBox {
-    height: 35px;
-    border: #cececf solid 1px;
-    background: #fafafa;
-}
-
 .inputBox-input-div {
     float: left;
     height: 33px;
@@ -184,17 +179,8 @@ body {
     -moz-transition: all 0.25s ease-in-out;
 }
 
-.searchBox-icon {
-    float: right;
-    width: 20px;
-    height: 26px;
-    margin: 7px 7px 0;
-    background: url(../../../images/search-generic-icon.png) no-repeat;
-}
-
 .selectBox {
     float: left;
-    width: 75px;
     height: 35px;
     border: #cececf solid 1px;
     background: #fafafa;
@@ -206,24 +192,17 @@ body {
     font-size: 13px;
     color: #666;
     font-family: Arial, Helvetica, sans-serif;
-    width: 70px;
-    height: 30px;
+    height: 35px;
     padding: 0 10px;
-    background: none
+    background: none;
+    width: 100%;
+    outline: none;
 }
 
-.input>div>input {
-    border: none;
-    font-weight: normal;
-    font-size: 13px !important;
-    color: #666 !important;
-    background: none;
-    height: 25px;
-    padding: 5px 5px 0 10px;
-    outline: none;
-    transition: all 0.25s ease-in-out;
-    -webkit-transition: all 0.25s ease-in-out;
-    -moz-transition: all 0.25s ease-in-out;
+.select:focus {
+    box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1)
 }
 
 .addButton-icon {
@@ -282,4 +261,155 @@ body {
 
 .active-desc {
     background: url(../../../images/sort_desc.png);
+}
+
+/*datatable changes*/
+
+.table-component {
+    overflow: auto;
+}
+
+.dataTable>tbody>tr>td {
+    height: auto;
+    word-break: break-all;
+    padding-top: 6px;
+    padding-left: 15px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.dataTable>tbody>tr:hover {
+    background: #e1e1df;
+}
+
+.dataTable>thead>tr {
+    background: #fafafa;
+    border: solid #333 1px;
+    cursor: pointer;
+    text-decoration: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.dataTable>thead>tr>a {
+    text-decoration: none;
+}
+
+.dataTable>tbody>tr {
+    background: #fafafa;
+    border-left: solid #cececf 1px;
+    border-right: solid #cececf 1px;
+    border-bottom: solid #cececf 1px;
+}
+
+.sortIcon {
+    display: block;
+    padding: 7px;
+    background-repeat: no-repeat !important;
+    background-size: 13px 13px !important;
+    /*background-position-y: 9px;*/
+    /*background-position-x: -4px;*/
+    font-weight: normal;
+    color: #BEBBBB;
+    text-align: left;
+    padding-left: 12px;
+    background-position: 0px 10px;
+}
+
+.table-component .table {
+    margin: 0;
+    border-bottom: #1c1c1c solid 3px;
+}
+
+.inputBox {
+    background: #fafafa;
+}
+
+.inputBox-input-div {
+    float: left;
+    height: 33px;
+}
+
+.searchBox-input {
+    border: none;
+    font-weight: normal;
+    font-size: 13px !important;
+    color: #666 !important;
+    background: none;
+    height: 25px;
+    padding: 5px 5px 0 10px;
+    outline: none;
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+}
+
+.inputBox>div>input {
+    border: none;
+    font-weight: normal;
+    font-size: 13px !important;
+    color: #666 !important;
+    background: none;
+    height: 100%;
+    padding: 0px 5px 0 10px;
+    outline: none;
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    border: #cececf solid 1px;
+}
+
+.inputBox>div>input:focus {
+    box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    border: 1px solid rgba(63, 171, 255, 0.77);
+}
+
+.search>div>input {
+    background: url(../../../images/search-generic-icon.png) no-repeat;
+    width: 160px;
+    background-position: 174px;
+    height: 35px;
+    padding-right: 30px;
+}
+
+.search>div>input:focus {
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    border: 1px solid rgba(63, 171, 255, 0.77);
+}
+
+.ns-button {
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 1px 15px;
+    font-size: 12px;
+    font-weight: bold;
+    height: 37px;
+    width: 100px;
+    color: #eee;
+    background-color: #333;
+    outline: none;
+}
+
+.ns-button:hover {
+    background: #666;
+}
+
+.ns-button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    border: 1px solid rgba(63, 171, 255, 0.77);
 }

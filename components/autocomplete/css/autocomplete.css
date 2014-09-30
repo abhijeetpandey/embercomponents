@@ -37,3 +37,29 @@
 #cc-auto li {
     list-style: none;
 }
+
+#cc-auto{
+    height: 35px;
+}
+
+.input>div>input, #cc-auto>input {
+    border: none;
+    font-weight: normal;
+    font-size: 13px !important;
+    color: #666 !important;
+    background: none;
+    height: 100%;
+    padding: 0px 5px 0 10px;
+    outline: none;
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    border: #cececf solid 1px;
+}
+
+.input>div>input:focus, #cc-auto>input:focus {
+    box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
+    border: 1px solid rgba(63, 171, 255, 0.77);
+}
