@@ -65,6 +65,8 @@
     width: 25%;
     float: left;
     color: #808080;
+    background: url(/sites/all/themes/abessive/images/pagination-right.png) no-repeat;
+
 }
 
 .previousPage {
@@ -72,6 +74,7 @@
     width: 25%;
     float: left;
     color: #808080;
+    background: url(/sites/all/themes/abessive/images/pagination-left.png) no-repeat;
 }
 
 .red {
@@ -81,6 +84,7 @@
 .table {
     width: 100%;
     margin: 0 auto 10px auto;
+    overflow: auto;
 }
 
 body {
@@ -96,7 +100,7 @@ body {
     width: 75%;
     margin-left: auto;
     margin-right: auto;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .table {
@@ -412,4 +416,87 @@ body {
     -webkit-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     border: 1px solid rgba(63, 171, 255, 0.77);
+}
+
+
+/*pagination*/
+@charset "UTF-8";
+/* CSS Document */
+
+
+.paginationbox{
+    width:410px;
+    height:25px;
+    margin:20px auto;
+    text-align: center;
+}
+.paginationbox ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display: inline-block;
+}
+.paginationbox ul li a{
+    width:25px;
+    height:23px;
+    float:left;
+}
+.paginationbox li{
+    float:left;
+    padding:0px;
+    list-style:none;
+    border:solid #cececf 1px;
+    margin-left: 5px;
+
+}
+
+.paginationbox ul:first-child{
+    margin:0;
+}
+
+.paginationbox li a{
+    background:#fafafa;
+    color:#999;
+    display:block;
+    font-weight:normal;
+    margin:0px;
+    text-align:center;
+    text-decoration:none;
+    font-size:12px;
+    padding:2px 0 0;
+}
+
+.paginationbox li a:hover{
+    background:#eee;
+    text-decoration:none;
+}
+
+
+.paginationbox li.jump a{
+    background: #333;
+    color: #eee;
+}
+
+.active {
+    color: #555555;
+    text-decoration: none;
+    background-color: #e5e5e5;
+    -webkit-box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
+    -moz-box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
+}
+
+li a.active {
+    color: #000000;
+}
+
+.paginationbox li a.disabled:hover{
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    background:#fafafa;
+}
+
+.paginationbox li a.disabled{
+    opacity: 0.5;
+    filter: alpha(opacity=50);
 }

@@ -1,7 +1,126 @@
 //TODO:Add error handling from smooth operation
 (function () {
     Ember.TEMPLATES['dataTableRow'] = Ember.Handlebars.compile("<td>{{id}}</td><td>{{name}}</td><td>{{age}}</td>");
-    Ember.TEMPLATES['components/data-table'] = Ember.Handlebars.compile("<div {{bind-attr class=cssClass}}>  </div> <div class='table-component'>     <div class='topBox'>         <!--search box-->         {{#if table.searchable}}         <div class='topBox-item'>             <div class='inputBox search'>                 <div class='inputBox-input-div'>                     {{input type='text' value=table.search class='searchBox-input'}}                 </div>              </div>         </div>         {{/if}}          {{#if table.pagination}}         <div class='topBox-item'>             <div class='selectBox'>                 {{view Ember.Select content=table.perPageSelector value=table.itemsPerPage class='select'}}             </div>         </div>         {{/if}}          {{#if table.filterable}}         {{#if table.availableFilters.length}}         <div class='topBox-item'>             <div class='selectBox'>                 {{view Ember.Select content=table.availableFilters value=table.filterName class='select'}}             </div>         </div>          <div class='topBox-item'>             <div class='inputBox'>                 <div class='inputBox-input-div'>                     {{auto-complete localdata=table.autodata searchText=table.filterValue class='input'}}                 </div>          </div>         </div>          <div class='topBox-item'><button class='ns-button' {{action 'addFilter'}}>Apply</button></div>         {{/if}}         {{/if}}     </div>       {{#if table.appliedFilters.length}}     <div class='tag-container'>         {{#each filter in table.appliedFilters}}         <div class='tag-box'>             <div class='tag-text'>{{filter.name}}:{{filter.value}}</div>      <a {{action 'deleteFilter' filter.name filter.value}}><div class='tag-remove-icon'></div></a>         </div>         {{/each}}     </div>     {{/if}}      <div class='table'>         <table class='dataTable'>             <thead>             <tr>                 {{#each header in table.headers}}                 <th >                     {{#if table.queryParamsEnabled}} {{#link-to linkRouter (query-params page=1 sortBy=header.name  order=header.order)  target='controller'}}<div {{bind-attr class=header.class}}>{{header.header}}</div>{{/link-to}}                     {{else}} <a {{action 'getSortedContent' header.name}} ><div {{bind-attr class=header.class}}>{{header.header}}</div></a>                     {{/if}}                 </th>                 {{/each}}             </tr>             </thead>             <tbody>             {{#each row in table.paginatedContent }}             {{view Ember.DataTableRowView contextBinding='row' rowTemplate=table.rowTemplate table=table}}             {{/each}}             </tbody>         </table>     </div>      {{#if table.pagination}}     <div class='paginator'> {{#if table.queryParamsEnabled}}         <div class='previousPage'>{{#link-to linkRouter (query-params page=table.prevPage)             target='controller'}}Prev{{/link-to}}         </div>         {{else}}         <div class='previousPage'>{{#if table.prev}}<a href='' {{action getPreviousPage}}>prev</a>             {{else}}prev{{/if}}         </div>         {{/if}}         <div style='text-align: center;width: 50%;float: left;'>             <div class=' pageInfo    '>{{table.currentPage}} of {{table.availablePages}}</div>         </div>         {{#if table.queryParamsEnabled}}         <div class='nextPage'>{{#link-to linkRouter (query-params page=table.nextPage)             target='controller'}}Next{{/link-to}}         </div>         {{else}}         <div class='nextPage'>{{#if table.next}}<a href=''{{action getNextPage}}>next</a>{{else}}next{{/if}}</div>         {{/if}}     </div>     {{/if}} </div>");
+    Ember.TEMPLATES['components/data-table'] = Ember.Handlebars.compile("" +
+        "<div {{bind-attr class=cssClass}}>  </div>" +
+        "<div class='table-component'>" +
+        "    <div class='topBox'> {{#if table.searchable}}" +
+        "        <div class='topBox-item'>" +
+        "            <div class='inputBox search'>" +
+        "                <div class='inputBox-input-div'> {{input type='text' value=table.search class='searchBox-input'}}</div>" +
+        "            </div>" +
+        "        </div>" +
+        "        {{/if}} {{#if table.pagination}}" +
+        "        <div class='topBox-item'>" +
+        "            <div class='selectBox'> {{view Ember.Select content=table.perPageSelector value=table.itemsPerPage" +
+        "                class='select'}}" +
+        "            </div>" +
+        "        </div>" +
+        "        {{/if}} {{#if table.filterable}} {{#if table.availableFilters.length}}" +
+        "        <div class='topBox-item'>" +
+        "            <div class='selectBox'> {{view Ember.Select content=table.availableFilters value=table.filterName" +
+        "                class='select'}}" +
+        "            </div>" +
+        "        </div>" +
+        "        <div class='topBox-item'>" +
+        "            <div class='inputBox'>" +
+        "                <div class='inputBox-input-div'> {{auto-complete localdata=table.autodata searchText=table.filterValue" +
+        "                    class='input'}}" +
+        "                </div>" +
+        "            </div>" +
+        "        </div>" +
+        "        <div class='topBox-item'>" +
+        "            <button class='ns-button'" +
+        "            {{action 'addFilter'}}>Apply</button></div>" +
+        "        {{/if}} {{/if}}" +
+        "    </div>" +
+        "    {{#if table.appliedFilters.length}}" +
+        "    <div class='tag-container'> {{#each filter in table.appliedFilters}}" +
+        "        <div class='tag-box'>" +
+        "            <div class='tag-text'>{{filter.name}}:{{filter.value}}</div>" +
+        "            <a {{action 'deleteFilter' filter.name filter.value}}>" +
+        "            <div class='tag-remove-icon'></div>" +
+        "            </a>         </div>" +
+        "        {{/each}}" +
+        "    </div>" +
+        "    {{/if}}" +
+        "    <div class='table'>" +
+        "        <table class='dataTable'>" +
+        "            <thead>" +
+        "            <tr> {{#each header in table.headers}}" +
+        "            <th> {{#if table.queryParamsEnabled}} {{#link-to linkRouter (query-params page=1 sortBy=header.name" +
+        "                order=header.order) target='controller'}}" +
+        "                <div" +
+        "                {{bind-attr class=header.class}}>{{header.header}}" +
+        "    </div>" +
+        "    {{/link-to}} {{else}} <a {{action 'getSortedContent' header.name}} >" +
+        "    <div" +
+        "    {{bind-attr class=header.class}}>{{header.header}}" +
+        "</div></a>                     {{/if}}                 </th>                 {{/each}}             </tr>             </thead>" +
+        "<tbody> {{#each row in table.paginatedContent }} {{view Ember.DataTableRowView contextBinding='row'" +
+        "rowTemplate=table.rowTemplate table=table}} {{/each}}" +
+        "</tbody>         </table>     </div>      {{#if table.pagination}}" +
+        "<div class='paginationbox'>" +
+        "<ul>" +
+        " {{#if table.queryParamsEnabled}}" +
+        "<li class='jump'>{{#link-to linkRouter (query-params page=1) target='controller'}}" +
+        "1{{/link-to}}" +
+        "</li>" +
+        "{{else}}" +
+        "<li class='jump'><a href='' {{action getFirstPage}}>1</a>" +
+        "</li>" +
+        "{{/if}}" +
+        " {{#if table.queryParamsEnabled}}" +
+        "<li >{{#if table.prev}}{{#link-to linkRouter (query-params page=table.prevPage) target='controller'}}<img" +
+        "        src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/>{{/link-to}}" +
+        "{{else}}" +
+        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
+        "{{/if}}" +
+        "</li>" +
+        "{{else}}" +
+        "<li >{{#if table.prev}}<a href='' {{action getPreviousPage}}><img src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
+        "{{else}}" +
+        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
+        "{{/if}}" +
+        "</li>" +
+        "{{/if}}" +
+        "{{#each row in table.paginator}}" +
+        " {{#if table.queryParamsEnabled}}" +
+        "<li >{{#link-to linkRouter (query-params page=row.num) target='controller'}}" +
+        "{{row.num}}{{/link-to}}" +
+        "</li>" +
+        "{{else}}" +
+        "<li ><a {{bind-attr class=row.cssClass}} href=''{{action getPage row.num}}>" +
+        "{{row.num}}" +
+        "</a>" +
+        "</li>" +
+        "{{/if}}" +
+        "{{/each}}" +
+        " {{#if table.queryParamsEnabled}}" +
+        "<li >{{#if table.next}}{{#link-to linkRouter (query-params page=table.nextPage) target='controller'}}<img" +
+        "        src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/>{{/link-to}}" +
+        "{{else}}" +
+        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
+        "{{/if}}" +
+        "</li>" +
+        "{{else}}" +
+        "<li >{{#if table.next}}<a href=''{{action getNextPage}}><img src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
+        "{{else}}" +
+        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
+        "{{/if}}" +
+        "</li>" +
+        "{{/if}}" +
+        " {{#if table.queryParamsEnabled}}" +
+        "<li class='jump'>{{#link-to linkRouter (query-params page=table.availablePages) target='controller'}}" +
+        "{{table.availablePages}}{{/link-to}}" +
+        "</li>" +
+        "{{else}}" +
+        "<li class='jump'><a href='' {{action getLastPage}}>{{table.availablePages}}</a>" +
+        "</li>" +
+        "{{/if}}" +
+        "</ul>" +
+        "</div>" +
+        "   {{/if}} </div>");
 
     String.prototype.capitalize = function () {
         return this.charAt(0).toUpperCase() + this.slice(1);
@@ -41,6 +160,7 @@
             return this.get('page');
         }.property('page'),
         page:1,
+        maxDisp:7,
         pageObserver:function () {
             this.set('currentPage', this.get('page'));
         }.observes('page'),
@@ -49,6 +169,40 @@
         }.property('currentPage'),
         next:function () {
             return this.get('currentPage') != this.get('availablePages');
+        }.property('currentPage', 'availablePages'),
+        paginator:function () {
+            var paginator = Ember.A();
+            var availablePages = this.get('availablePages');
+            var currentPage = this.get('currentPage');
+            var maxDisp = this.get('maxDisp');
+            var i;
+            if (availablePages <= maxDisp) {
+                for (i = 1; i <= availablePages; i++) {
+                    paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                }
+            } else {
+                if(currentPage <=Math.floor(maxDisp/2))
+                {
+                    for (i = 1; i <= maxDisp; i++) {
+                        paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                    }
+                }else if(availablePages-currentPage>Math.floor(maxDisp/2)){
+                    if(maxDisp%2==0)
+                    {
+                        var start = Math.floor(maxDisp/2)-1;
+                    }else{
+                        var start = Math.floor(maxDisp/2);
+                    }
+                    for (i = currentPage-start; i <= currentPage-start-1+maxDisp; i++) {
+                        paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                    }
+                }else{
+                    for (i = availablePages-maxDisp+1; i <= availablePages; i++) {
+                        paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                    }
+                }
+            }
+            return paginator;
         }.property('currentPage', 'availablePages'),
         pages:function () {
             var availablePages = this.get('availablePages'),
@@ -103,6 +257,9 @@
                     return null;
                 }
                 this.set('currentPage', this.get('currentPage') - 1);
+            },
+            pageByNum:function(pageNum){
+                this.set('currentPage',pageNum);
             }
         }
     });
@@ -403,6 +560,16 @@
                 this.triggerAction({
                     action:'nextPage',
                     target:parent.get('table')
+                });
+                this.send('ready');
+            },
+            getPage:function (pageNum) {
+                this.send('loading');
+                var parent = this;
+                this.triggerAction({
+                    action:'pageByNum',
+                    target:parent.get('table'),
+                    actionContext:pageNum
                 });
                 this.send('ready');
             },
