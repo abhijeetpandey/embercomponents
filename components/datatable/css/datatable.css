@@ -500,3 +500,15 @@ li a.active {
     opacity: 0.5;
     filter: alpha(opacity=50);
 }
+
+
+/*scrollnav*/
+
+/*.table-component>.nav{*/
+    /*position: absolute;*/
+    /*top:260px;*/
+/*}*/
+
+.nav-img{
+    height: 60px;
+}

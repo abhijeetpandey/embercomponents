@@ -45,6 +45,8 @@
         "    </div>" +
         "    {{/if}}" +
         "    <div class='table'>" +
+        "<div class='left-nav nav'><img class='nav-img' src='/em/images/nav-left.png'></div>" +
+        "<div class='right-nav nav'><img class='nav-img' src='/em/images/nav-right.png'></div>" +
         "        <table class='dataTable'>" +
         "            <thead>" +
         "            <tr> {{#each header in table.headers}}" +
@@ -67,20 +69,20 @@
         "1{{/link-to}}" +
         "</li>" +
         "{{else}}" +
-        "<li class='jump'><a href='' {{action getFirstPage}}>1</a>" +
+        "<li class='jump'><a href='' {{action getPage 1}}>1</a>" +
         "</li>" +
         "{{/if}}" +
         " {{#if table.queryParamsEnabled}}" +
         "<li >{{#if table.prev}}{{#link-to linkRouter (query-params page=table.prevPage) target='controller'}}<img" +
-        "        src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/>{{/link-to}}" +
+        "        src='/em/images/pagination-left.png' alt='Previous' title='Previous' border='0'/>{{/link-to}}" +
         "{{else}}" +
-        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
+        "<a class='disabled'><img src='/em/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
         "{{/if}}" +
         "</li>" +
         "{{else}}" +
-        "<li >{{#if table.prev}}<a href='' {{action getPreviousPage}}><img src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
+        "<li >{{#if table.prev}}<a href='' {{action getPreviousPage}}><img src='/em/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
         "{{else}}" +
-        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
+        "<a class='disabled'><img src='/em/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
         "{{/if}}" +
         "</li>" +
         "{{/if}}" +
@@ -98,15 +100,15 @@
         "{{/each}}" +
         " {{#if table.queryParamsEnabled}}" +
         "<li >{{#if table.next}}{{#link-to linkRouter (query-params page=table.nextPage) target='controller'}}<img" +
-        "        src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/>{{/link-to}}" +
+        "        src='/em/images/pagination-right.png' alt='Next' title='Next' border='0'/>{{/link-to}}" +
         "{{else}}" +
-        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
+        "<a class='disabled'><img src='/em/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
         "{{/if}}" +
         "</li>" +
         "{{else}}" +
-        "<li >{{#if table.next}}<a href=''{{action getNextPage}}><img src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
+        "<li >{{#if table.next}}<a href=''{{action getNextPage}}><img src='/em/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
         "{{else}}" +
-        "<a class='disabled'><img src='/sites/all/themes/abessive/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
+        "<a class='disabled'><img src='/em/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
         "{{/if}}" +
         "</li>" +
         "{{/if}}" +
@@ -115,7 +117,7 @@
         "{{table.availablePages}}{{/link-to}}" +
         "</li>" +
         "{{else}}" +
-        "<li class='jump'><a href='' {{action getLastPage}}>{{table.availablePages}}</a>" +
+        "<li class='jump'><a href='' {{action getPage table.availablePages}}>{{table.availablePages}}</a>" +
         "</li>" +
         "{{/if}}" +
         "</ul>" +
@@ -178,27 +180,25 @@
             var i;
             if (availablePages <= maxDisp) {
                 for (i = 1; i <= availablePages; i++) {
-                    paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                    paginator.pushObject(Ember.Object.create({num:i, cssClass:(currentPage == i ? 'active' : '')}));
                 }
             } else {
-                if(currentPage <=Math.floor(maxDisp/2))
-                {
+                if (currentPage <= Math.floor(maxDisp / 2)) {
                     for (i = 1; i <= maxDisp; i++) {
-                        paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                        paginator.pushObject(Ember.Object.create({num:i, cssClass:(currentPage == i ? 'active' : '')}));
                     }
-                }else if(availablePages-currentPage>Math.floor(maxDisp/2)){
-                    if(maxDisp%2==0)
-                    {
-                        var start = Math.floor(maxDisp/2)-1;
-                    }else{
-                        var start = Math.floor(maxDisp/2);
+                } else if (availablePages - currentPage > Math.floor(maxDisp / 2)) {
+                    if (maxDisp % 2 == 0) {
+                        var start = Math.floor(maxDisp / 2) - 1;
+                    } else {
+                        var start = Math.floor(maxDisp / 2);
                     }
-                    for (i = currentPage-start; i <= currentPage-start-1+maxDisp; i++) {
-                        paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                    for (i = currentPage - start; i <= currentPage - start - 1 + maxDisp; i++) {
+                        paginator.pushObject(Ember.Object.create({num:i, cssClass:(currentPage == i ? 'active' : '')}));
                     }
-                }else{
-                    for (i = availablePages-maxDisp+1; i <= availablePages; i++) {
-                        paginator.pushObject(Ember.Object.create({num:i,cssClass:(currentPage==i?'active':'')}));
+                } else {
+                    for (i = availablePages - maxDisp + 1; i <= availablePages; i++) {
+                        paginator.pushObject(Ember.Object.create({num:i, cssClass:(currentPage == i ? 'active' : '')}));
                     }
                 }
             }
@@ -258,8 +258,8 @@
                 }
                 this.set('currentPage', this.get('currentPage') - 1);
             },
-            pageByNum:function(pageNum){
-                this.set('currentPage',pageNum);
+            pageByNum:function (pageNum) {
+                this.set('currentPage', pageNum);
             }
         }
     });
@@ -523,6 +523,51 @@
     });
 
     var DataTableComponent = Ember.Component.extend(Ember.TargetActionSupport, {
+        didInsertElement:function () {
+            this._super();
+            var parentElement = $(this.get('element'));
+            var dataTable = $(parentElement.find('.dataTable')[0]);
+            var navs = parentElement.find('.nav');
+            navs.hide();
+
+            navs.mouseover(function(){
+                var dataTable = $(this.parentNode).find('.dataTable') ;
+                if($(this).hasClass('right-nav')){
+                    dataTable.parent().animate({scrollLeft:dataTable.width()});
+                }else if($(this).hasClass('left-nav')){
+                    dataTable.parent().animate({scrollLeft:0});
+                }
+            });
+
+
+
+            dataTable.mouseover(function () {
+                var parentElement = this.parentNode;
+                var isScrollable = Math.abs(($(this).width() - $(parentElement).width())) > 2;
+                if (isScrollable) {
+                    var navs = $(parentElement.parentNode).find('.nav');
+                    navs.css('position', 'fixed');
+                    var diffPos = $(this).position().top + 150;
+                    navs.css('top',diffPos);
+                    $(parentElement).find('.right-nav').css('left', ($(parentElement).position().left + $(parentElement).width()) - 30);
+                    if(dataTable.parent().height()-$(window).scrollTop()>200)
+                    {
+                        navs.fadeIn();
+                    } else{
+                        navs.hide();
+                    }
+                }
+                console.log($(window).scrollTop());
+                console.log(dataTable.parent().height());
+            });
+
+
+            dataTable.parent().mouseleave(function () {
+                var parentElement = this;
+                var elements = $(parentElement.parentNode).find('.nav');
+                elements.fadeOut();
+            });
+        },
         linkRouter:function () {
             //ref http://stackoverflow.com/questions/15019212/ember-app-router-router-currentstate-undefined/
             var router = App.__container__.lookup("router:main"); //lookup the router

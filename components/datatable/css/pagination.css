@@ -1,0 +1,44 @@
+@charset "UTF-8";
+/* CSS Document */
+
+
+.paginationbox{
+	width:312px;
+	height:25px;
+	margin:20px auto;
+	border-bottom:solid #cececf 1px;
+	border-left:solid #cececf 1px;
+	border-top:solid #cececf 1px;
+}
+.paginationbox ul{
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+.paginationbox ul li a{
+	width:25px;
+	height:23px;
+	float:left;
+	border-right:solid #cececf 1px;
+}
+.paginationbox li{
+	float:left;
+	padding:0px;
+	list-style:none;
+}
+.paginationbox li a{
+	background:#fafafa;
+	color:#999;
+	display:block;
+	font-weight:normal;
+	margin:0px;
+	text-align:center;
+	text-decoration:none;
+	font-size:12px;
+	padding:2px 0 0;
+}
+
+.paginationbox li a:hover{
+	background:#eee;
+	text-decoration:none;
+}
