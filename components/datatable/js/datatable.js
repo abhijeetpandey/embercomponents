@@ -557,8 +557,6 @@
                         navs.hide();
                     }
                 }
-                console.log($(window).scrollTop());
-                console.log(dataTable.parent().height());
             });
 
 
