@@ -558,11 +558,9 @@
 
                 $(window).on('scroll',function(){
                     var navs = dataTable.parent().find('.nav');
-                    if(dataTable.parent().height()-$(window).scrollTop()>200)
+                    if(!dataTable.parent().height()-$(window).scrollTop()>200)
                     {
-                        navs.fadeIn();
-                    } else{
-                        navs.hide();
+                       navs.hide();
                     }
                 });
             });
