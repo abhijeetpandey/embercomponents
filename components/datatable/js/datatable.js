@@ -416,7 +416,7 @@
             var parent = this;
             var hiddenProperties = this.get('hidden');
             $.each(properties, function (key, value) {
-                if ($.inArray(value, hiddenProperties)) {
+                if ($.inArray(value, hiddenProperties)<0) {
                     obj.push({
                         header:parent.getPropertyAlias(value),
                         name:value,
@@ -539,8 +539,6 @@
                 }
             });
 
-
-
             dataTable.mouseover(function () {
                 var parentElement = this.parentNode;
                 var isScrollable = Math.abs(($(this).width() - $(parentElement).width())) > 2;
@@ -557,10 +555,19 @@
                         navs.hide();
                     }
                 }
+
+                $(window).on('scroll',function(){
+                    if(dataTable.parent().height()-$(window).scrollTop()>200)
+                    {
+                        navs.fadeIn();
+                    } else{
+                        navs.hide();
+                    }
+                });
             });
 
-
             dataTable.parent().mouseleave(function () {
+                $(window).unbind('scroll');
                 var parentElement = this;
                 var elements = $(parentElement.parentNode).find('.nav');
                 elements.fadeOut();
