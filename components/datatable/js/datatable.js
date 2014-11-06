@@ -37,11 +37,12 @@
         "    {{#if table.appliedFilters.length}}" +
         "    <div class='tag-container'> {{#each filter in table.appliedFilters}}" +
         "        <div class='tag-box'>" +
-        "            <div class='tag-text'>{{filter.name}}:{{filter.value}}</div>" +
+        "            <div {{bind-attr title=filter.value}} class='tag-text'>{{filter.name}} : {{filter.value}}</div>" +
         "            <a {{action 'deleteFilter' filter.name filter.value}}>" +
         "            <div class='tag-remove-icon'></div>" +
         "            </a>         </div>" +
         "        {{/each}}" +
+        "   <div class='tag-text' style='color: #999; float: right;'>{{table.fullData.length}} of {{table.content.length}} items(s) </div>" +
         "    </div>" +
         "    {{/if}}" +
         "    <div class='table'>" +
