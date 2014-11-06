@@ -1,6 +1,6 @@
 (function () {
     Ember.TEMPLATES['defaultItemContainer'] = Ember.Handlebars.compile("{{text}}");
-    Ember.TEMPLATES['components/auto-complete'] = Ember.Handlebars.compile("<div id='cc-auto' >{{view textField placeholder=placeholder class=cssclass size=size maxlength=maxlength valueBinding='searchText'}}{{#if ulVisible}}{{view UlView contextBinding='searchResults' index=currentIndex}}{{/if}}</div>");
+    Ember.TEMPLATES['components/auto-complete'] = Ember.Handlebars.compile("<div id='cc-auto' {{bind-attr class=cssclass}} >{{view textField placeholder=placeholder class=cssclass size=size maxlength=maxlength valueBinding='searchText'}}{{#if ulVisible}}{{view UlView contextBinding='searchResults' index=currentIndex}}{{/if}}</div>");
     Ember.TEMPLATES['ulViewContainer'] = Ember.Handlebars.compile("{{#each item in this}}{{view view.parentView.ItemView contextBinding='item' currentIndex=view.parentView.currentIndex}}{{/each}}");
 
     var AutoCompleteComponent = Ember.Component.extend({
@@ -24,15 +24,14 @@
         valueType:'text', //additional type  required from autocomplete,
         populateResults:true,
         focusOut:function (event) {
-            if(this.get('ulVisible'))
-            {
+            if (this.get('ulVisible')) {
                 this.send('focusOut', event);
             }
         },
         keyDown:function (event) {
             if (event.keyCode == 9) {
                 this.send('changeText');
-            }else{
+            } else {
                 this.send('traverse', event);
             }
         },
@@ -97,8 +96,7 @@
             return filteredContent.toArray();
         },
         searchTextObserver:function () {
-            if(!this.get('isAutoCompleteOn'))
-            {
+            if (!this.get('isAutoCompleteOn')) {
                 return;
             }
 
@@ -113,7 +111,7 @@
                 var items = [];
                 var url = this.get('url');
                 if (Ember.isEmpty(this.get('localdata'))) {
-                    items = this.get('cache').get(url+searchText);
+                    items = this.get('cache').get(url + searchText);
                     if (Ember.isEmpty(items)) {
                         $.ajax({
                             type:"GET",
@@ -121,18 +119,20 @@
                             async:true
                         }).done(function (data) {
                                 items = JSON.parse(data);
-                                parent.get('cache').set(url+searchText, items);
-                                parent.prepareSearchResults(items, parent);
+                                parent.get('cache').set(url + searchText, items);
+                                parent.setSearchResults(parent.prepareSearchResults(items, parent));
+
                             });
                     } else {
-                        parent.prepareSearchResults(items, parent);
+                        parent.setSearchResults(parent.prepareSearchResults(items, parent));
                     }
                 }
                 else {
                     items = this.getFilteredData(this.get('localdata'));
-                    parent.get('prepareSearchResults')(items, parent);
+                    parent.setSearchResults(parent.prepareSearchResults(items, parent));
                 }
             }
+            this.validateSearchText();
         }.observes('searchText'),
         prepareSearchResults:function (items, context) {
             var parent = context;
@@ -150,7 +150,10 @@
                 }
 
             });
-            context.set('searchResults', auto);
+            return auto;
+        },
+        setSearchResults:function (results) {
+            this.set('searchResults', results.splice(0,7));
         },
         actions:{
             changeText:function (internal_id) {
@@ -165,6 +168,7 @@
                 this.set('value', obj.get(this.get('valueType')));
                 this.set('searchResults', Ember.A());
                 this.set('populateResults', true);
+                this.validateSearchText();
             },
             traverse:function (event) {
                 var keyCode = event.keyCode;
@@ -188,10 +192,55 @@
                 if (!this.get('mouseOver')) {
                     this.set('currentIndex', 0);
                     this.set('searchResults', Ember.A());
+                    this.validateSearchText();
                 }
             },
             changeMouseState:function (state) {
                 this.set('mouseOver', state);
+            }
+        },
+        validateSearchText:function () {
+            var parent = this;
+            var searchText = this.get('searchText');
+
+            var items = [];
+            var url = this.get('url');
+
+            if (Ember.isEmpty(this.get('localdata'))) {
+                items = this.get('cache').get(url + searchText);
+                if (Ember.isEmpty(items)) {
+                    $.ajax({
+                        type:"GET",
+                        url:(this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText),
+                        async:true
+                    }).done(function (data) {
+                            items = JSON.parse(data);
+                            parent.get('cache').set(url + searchText, items);
+                            items = parent.prepareSearchResults(items, parent);
+                        });
+                } else {
+                    items = parent.prepareSearchResults(items, parent);
+                }
+            }
+            else {
+                items = this.getFilteredData(this.get('localdata'));
+                items = parent.prepareSearchResults(items, parent);
+            }
+
+            var valid = false;
+            if (!Ember.isEmpty(items)) {
+                $.each(items, function (key, value) {
+                    if (value.get(parent.get('primaryText')).trim() == searchText) {
+                        valid = true;
+                    }
+                });
+            }
+
+            if(!valid && searchText.length>0)
+            {
+                this.set('cssclass','input-error');
+            }else{
+                this.set('cssclass','');
             }
         }
     });

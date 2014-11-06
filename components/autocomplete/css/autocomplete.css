@@ -63,3 +63,10 @@
     -moz-box-shadow: 0 0 5px rgba(0, 143, 255, 1);
     border: 1px solid rgba(63, 171, 255, 0.77);
 }
+
+#cc-auto>input.input-error {
+    box-shadow: 0 0 5px rgba(255, 0, 10, 1);
+    -webkit-box-shadow: 0 0 5px rgba(255, 0, 10, 1);
+    -moz-box-shadow: 0 0 5px rgba(255, 0, 10, 1);
+    border: 1px solid rgba(255, 63, 63, 1);
+}
