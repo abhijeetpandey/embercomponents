@@ -24,7 +24,7 @@
         "        </div>" +
         "        <div class='topBox-item'>" +
         "            <div class='inputBox'>" +
-        "                <div class='inputBox-input-div'> {{auto-complete localdata=table.autodata searchText=table.filterValue" +
+        "                <div class='inputBox-input-div'> {{auto-complete minLength=1 localdata=table.autodata placeholder=table.placeholder searchText=table.filterValue" +
         "                    class='input'}}" +
         "                </div>" +
         "            </div>" +
@@ -42,7 +42,7 @@
         "            <div class='tag-remove-icon'></div>" +
         "            </a>         </div>" +
         "        {{/each}}" +
-        "   <div class='tag-text' style='color: #999; float: right;'>{{table.fullData.length}} of {{table.content.length}} items(s) </div>" +
+        "   <div class='tag-text' style='color: #999; float: right; font-size: 11px; font-style: italic; position: relative; top: 6px;'>{{table.fullData.length}} of {{table.content.length}} items(s) </div>" +
         "    </div>" +
         "    {{/if}}" +
         "    <div class='table'>" +
@@ -519,8 +519,14 @@
         }.observes('filterBy'),
         appliedFiltersObserver:function () {
             this.set('page', 1);
-        }.observes('fullData.length')
-
+        }.observes('fullData.length'),
+        filterNameObserver:function(){
+            var filterPlaceHolders = this.get('filterPlaceHolders');
+            var filterName = this.get('filterName');
+            if(!Ember.isEmpty(filterPlaceHolders)){
+                this.set('placeholder',filterPlaceHolders.get(this.getPropertyFromAlias(filterName)));
+            }
+        }.observes('filterName')
     });
 
     var DataTableComponent = Ember.Component.extend(Ember.TargetActionSupport, {
@@ -561,7 +567,7 @@
                     var navs = dataTable.parent().find('.nav');
                     if(!(dataTable.parent().height()-$(window).scrollTop()>200))
                     {
-                       navs.hide();
+                        navs.hide();
                     }
                 });
             });
