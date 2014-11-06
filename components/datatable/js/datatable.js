@@ -284,7 +284,7 @@
                 return;
             var autodata = Ember.A();
             var data = Ember.A();
-            this.get('model').forEach(function (item) {
+            this.get('fullData').forEach(function (item) {
                 data.push(Ember.Object.create(item).get(currentFilter));
             });
             data = data.uniq();
