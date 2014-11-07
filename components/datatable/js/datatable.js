@@ -24,7 +24,7 @@
         "        </div>" +
         "        <div class='topBox-item'>" +
         "            <div class='inputBox'>" +
-        "                <div class='inputBox-input-div'> {{auto-complete minLength=1 localdata=table.autodata placeholder=table.placeholder searchText=table.filterValue" +
+        "                <div class='inputBox-input-div'> {{auto-complete minLength=1 isValid=table.isValidFilterValue localdata=table.autodata placeholder=table.placeholder searchText=table.filterValue" +
         "                    class='input'}}" +
         "                </div>" +
         "            </div>" +
@@ -301,8 +301,14 @@
                 this.set('currentPage', 1);
             },
             applyFilter:function () {
+
                 var filterName = this.get('filterName');
                 var filterValue = this.get('filterValue');
+                if(!this.get('isValidFilterValue'))
+                {
+                    alert("Can't apply filter, enter a valid Filter Value. "+this.get('placeholder'));
+                    return;
+                }
 
                 if (!Ember.isEmpty(filterValue)) {
                     if (!filterValue.length > 0) {

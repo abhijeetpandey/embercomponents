@@ -8,6 +8,7 @@
         listItemContainer:"defaultItemContainer",
         isAutoCompleteOn:true,
         localdata:[],
+        isValid:false,
         ulVisible:true,
         primaryText:"text",
         minLength:3,
@@ -230,12 +231,13 @@
             var valid = false;
             if (!Ember.isEmpty(items)) {
                 $.each(items, function (key, value) {
-                    if (value.get(parent.get('primaryText')).trim() == searchText) {
+                    if (value.get(parent.get('primaryText')) == searchText) {
                         valid = true;
                     }
                 });
             }
 
+            this.set('isValid', valid);
             if(!valid && searchText.length>0)
             {
                 this.set('cssclass','input-error');
