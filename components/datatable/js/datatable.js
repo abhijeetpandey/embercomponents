@@ -289,7 +289,10 @@
             });
             data = data.uniq();
             data.forEach(function (item) {
-                autodata.push({text:item});
+                if(!Ember.isEmpty(item))
+                {
+                    autodata.push({text:item});
+                }
             });
             return autodata;
         }.property('filterName'),
