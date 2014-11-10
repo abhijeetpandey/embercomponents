@@ -194,7 +194,7 @@
                     this.set('currentIndex', 0);
                     this.set('searchResults', Ember.A());
                     this.validateSearchText();
-                }                                                                                           git
+                }
             },
             changeMouseState:function (state) {
                 this.set('mouseOver', state);
