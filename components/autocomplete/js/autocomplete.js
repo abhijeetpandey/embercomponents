@@ -75,7 +75,7 @@
                 return this.get('context').length == 0 ? 'none' : '';
             }.property('context'),
             didInsertElement:function () {
-                var outerWidth = $(this.get('parentView').$()[0].firstChild.childNodes[0]).outerWidth();
+                var outerWidth = $(this.get('parentView').$()).find("[type=text]").outerWidth();
                 this.$().css('min-width', outerWidth);
             }
         }),
@@ -194,7 +194,7 @@
                     this.set('currentIndex', 0);
                     this.set('searchResults', Ember.A());
                     this.validateSearchText();
-                }
+                }                                                                                           git
             },
             changeMouseState:function (state) {
                 this.set('mouseOver', state);
