@@ -122,18 +122,19 @@
                                 items = JSON.parse(data);
                                 parent.get('cache').set(url + searchText, items);
                                 parent.setSearchResults(parent.prepareSearchResults(items, parent));
-
+                                parent.validateSearchText();
                             });
                     } else {
                         parent.setSearchResults(parent.prepareSearchResults(items, parent));
+                        parent.validateSearchText();
                     }
                 }
                 else {
                     items = this.getFilteredData(this.get('localdata'));
                     parent.setSearchResults(parent.prepareSearchResults(items, parent));
+                    parent.validateSearchText();
                 }
             }
-            this.validateSearchText();
         }.observes('searchText'),
         prepareSearchResults:function (items, context) {
             var parent = context;
@@ -167,9 +168,9 @@
                 this.set('populateResults', false);
                 this.set('searchText', obj.get(this.get('primaryText')));
                 this.set('value', obj.get(this.get('valueType')));
+                this.validateSearchText();
                 this.set('searchResults', Ember.A());
                 this.set('populateResults', true);
-                this.validateSearchText();
             },
             traverse:function (event) {
                 var keyCode = event.keyCode;
@@ -193,42 +194,17 @@
                 if (!this.get('mouseOver')) {
                     this.set('currentIndex', 0);
                     this.set('searchResults', Ember.A());
-                    this.validateSearchText();
                 }
             },
             changeMouseState:function (state) {
                 this.set('mouseOver', state);
             }
         },
-        validateSearchText:function () {
-            var parent = this;
-            var searchText = this.get('searchText');
-
-            var items = [];
-            var url = this.get('url');
-
-            if (Ember.isEmpty(this.get('localdata'))) {
-                items = this.get('cache').get(url + searchText);
-                if (Ember.isEmpty(items)) {
-                    $.ajax({
-                        type:"GET",
-                        url:(this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText),
-                        async:true
-                    }).done(function (data) {
-                            items = JSON.parse(data);
-                            parent.get('cache').set(url + searchText, items);
-                            items = parent.prepareSearchResults(items, parent);
-                        });
-                } else {
-                    items = parent.prepareSearchResults(items, parent);
-                }
-            }
-            else {
-                items = this.getFilteredData(this.get('localdata'));
-                items = parent.prepareSearchResults(items, parent);
-            }
-
+        setValidValue:function(items)
+        {
             var valid = false;
+            var searchText = this.get('searchText');
+            var parent = this;
             if (!Ember.isEmpty(items)) {
                 $.each(items, function (key, value) {
                     if (value.get(parent.get('primaryText')) == searchText) {
@@ -244,6 +220,9 @@
             }else{
                 this.set('cssclass','');
             }
+        },
+        validateSearchText:function () {
+            this.setValidValue(this.get('searchResults'));
         }
     });
 
