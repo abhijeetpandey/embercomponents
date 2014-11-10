@@ -52,7 +52,7 @@
         "            <thead>" +
         "            <tr> {{#each header in table.headers}}" +
         "            <th> {{#if table.queryParamsEnabled}} {{#link-to linkRouter (query-params page=1 sortBy=header.name" +
-        "                order=header.order) target='controller'}}" +
+        "                order=header.order) }}" +
         "                <div" +
         "                {{bind-attr class=header.class}}>{{header.header}}" +
         "    </div>" +
@@ -66,7 +66,7 @@
         "<div class='paginationbox'>" +
         "<ul>" +
         " {{#if table.queryParamsEnabled}}" +
-        "<li class='jump'>{{#link-to linkRouter (query-params page=1) target='controller'}}" +
+        "<li class='jump'>{{#link-to linkRouter (query-params page=1) }}" +
         "1{{/link-to}}" +
         "</li>" +
         "{{else}}" +
@@ -74,7 +74,7 @@
         "</li>" +
         "{{/if}}" +
         " {{#if table.queryParamsEnabled}}" +
-        "<li >{{#if table.prev}}{{#link-to linkRouter (query-params page=table.prevPage) target='controller'}}<img" +
+        "<li >{{#if table.prev}}{{#link-to linkRouter (query-params page=table.prevPage) }}<img" +
         "        src='/em/images/pagination-left.png' alt='Previous' title='Previous' border='0'/>{{/link-to}}" +
         "{{else}}" +
         "<a class='disabled'><img src='/em/images/pagination-left.png' alt='Previous' title='Previous' border='0'/></a>" +
@@ -89,7 +89,7 @@
         "{{/if}}" +
         "{{#each row in table.paginator}}" +
         " {{#if table.queryParamsEnabled}}" +
-        "<li >{{#link-to linkRouter (query-params page=row.num) target='controller'}}" +
+        "<li >{{#link-to linkRouter (query-params page=row.num) }}" +
         "{{row.num}}{{/link-to}}" +
         "</li>" +
         "{{else}}" +
@@ -100,7 +100,7 @@
         "{{/if}}" +
         "{{/each}}" +
         " {{#if table.queryParamsEnabled}}" +
-        "<li >{{#if table.next}}{{#link-to linkRouter (query-params page=table.nextPage) target='controller'}}<img" +
+        "<li >{{#if table.next}}{{#link-to linkRouter (query-params page=table.nextPage) }}<img" +
         "        src='/em/images/pagination-right.png' alt='Next' title='Next' border='0'/>{{/link-to}}" +
         "{{else}}" +
         "<a class='disabled'><img src='/em/images/pagination-right.png' alt='Next' title='Next' border='0'/></a>" +
@@ -114,7 +114,7 @@
         "</li>" +
         "{{/if}}" +
         " {{#if table.queryParamsEnabled}}" +
-        "<li class='jump'>{{#link-to linkRouter (query-params page=table.availablePages) target='controller'}}" +
+        "<li class='jump'>{{#link-to linkRouter (query-params page=table.availablePages) }}" +
         "{{table.availablePages}}{{/link-to}}" +
         "</li>" +
         "{{else}}" +
