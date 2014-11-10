@@ -12,7 +12,7 @@
         "         <div class='topBox-item'>" +
         "             <div class='inputBox'>" +
         "                 <div class='inputBox-input-div'>" +
-        "                     {{auto-complete isAutoCompleteOn=isAutoCompleteOn localdata=data url=url qParam=qParam primaryText=primaryText placeholder=placeholder listItemContainer=listItemContainer searchText=filterValue class='input' minLength=1}}" +
+        "                     {{auto-complete isValid=isValidAutoCompleteValue isAutoCompleteOn=isAutoCompleteOn localdata=data url=url qParam=qParam primaryText=primaryText placeholder=placeholder listItemContainer=listItemContainer searchText=filterValue class='input' minLength=1}}" +
         "                 </div>" +
         "             </div>" +
         "         </div>" +
@@ -48,6 +48,7 @@
         filterValue:'',
         searchFor:'search',
         errorMsg:'',
+        isValidAutoCompleteValue:true,
         getInnerProperty:function (property, defaultValue) {
             var filterName = this.get('filterName');
             var filters = this.get('filters');
@@ -87,10 +88,16 @@
         filterUrl:function () {
             return this.get('baseUrl') + this.get('flattenAppliedFilters');
         }.property('baseUrl', 'flattenAppliedFilters'),
-        flattenAppliedFilters:function () {
+        updateAllMapDependentValues:function()
+        {
+            this.updateAppliedFiltersName();
+            this.updateAvailableFiltersName();
+            this.updateFlattenAppliedFilters();
+        },
+        updateFlattenAppliedFilters:function () {
             var appliedFilters = this.get('appliedFilters');
             var flattenedFilters = [];
-            appliedFilters.forEach(function (key, value) {
+            appliedFilters.forEach(function (value, key) {
                 flattenedFilters.push("" + value.name + "=" + encodeURIComponent(value.value));
             });
             if (flattenedFilters.length > 0) {
@@ -98,24 +105,24 @@
             }
             flattenedFilters.push(this.get('searchFor') + '=');
             flattenedFilters = "?" + flattenedFilters.join("&");
-            return flattenedFilters;
-        }.property('appliedFilters.length', 'searchFor'),
-        availableFiltersName:function () {
+            this.set('flattenAppliedFilters',flattenedFilters);
+        },
+        updateAvailableFiltersName:function () {
             var availableFilters = this.get('availableFilters');
             this.set('filterValue', '');
             var ar = availableFilters.keys.list.toArray();
             ar.sort();
             this.set('filterName', ar[0]);
-            return ar;
-        }.property('availableFilters.length'),
-        appliedFiltersName:function () {
+            this.set('availableFiltersName',ar);
+        },
+        updateAppliedFiltersName:function () {
             var appliedFilters = this.get('appliedFilters');
             var ar = Ember.A();
-            appliedFilters.forEach(function (key, val) {
+            appliedFilters.forEach(function (val, key) {
                 ar.push(Ember.Object.create({name:val.alias, value:val.value}));
             });
-            return ar;
-        }.property('appliedFilters.length'),
+            this.set('appliedFiltersName',ar);
+        },
         availableFilters:Ember.Map.create(),
         appliedFilters:Ember.Map.create(),
         filtersObserver:function () {
@@ -128,8 +135,14 @@
                     availableFilters.set(value.alias, value);
                 }
             });
-        }.observes('filters.length').on('didInsertElement'),
+            this.updateAllMapDependentValues();
+        }.observes('filters.length').on('init'),
         validateFilterData:function (filterValue, filterType) {
+            var isValidAutoCompleteValue= this.get('isValidAutoCompleteValue');
+            if(!isValidAutoCompleteValue)
+            {
+                return false;
+            }
             switch (filterType) {
                 case 'number':
                     return !isNaN(filterValue);
@@ -153,7 +166,6 @@
         },
         actions:{
             applyFilter:function () {
-                console.debug('applying filter');
                 var filterName = this.get('filterName');
                 var filterValue = this.get('filterValue');
                 var appliedFilters = this.get('appliedFilters');
@@ -167,7 +179,8 @@
                             var isValid = this.validateFilterData(filterValue, filterData.type);
                             if (isValid) {
                                 appliedFilters.set(filterName, Ember.Object.create(filterData, {value:filterValue}));
-                                availableFilters.remove(filterName);
+                                availableFilters.delete(filterName);
+                                this.updateAllMapDependentValues();
                             } else {
                                 this.set('errorMsg','Cannot Apply filter '+filterName+'. Please check value');
                             }
@@ -183,8 +196,8 @@
                 var value = appliedFilters.get(filterName);
                 delete value.value;
                 availableFilters.set(filterName, value);
-                appliedFilters.remove(filterName);
-
+                appliedFilters.delete(filterName);
+                this.updateAllMapDependentValues();
             }
         }
     });
