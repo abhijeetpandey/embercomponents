@@ -12,8 +12,10 @@
         ulVisible:true,
         primaryText:"text",
         minLength:3,
+        listLimit:7,
         url:'',
-        searchText:'',
+        searchText:null,
+        searchObj:null,
         currentIndex:-1,
         qParam:null, //by default set to null
         propertiesToSearch:null,
@@ -24,6 +26,36 @@
         value:'', //by default will have same value of searchText (text)
         valueType:'text', //additional type  required from autocomplete,
         populateResults:true,
+        ajax:function(obj){
+            var parent = this;
+            return $.ajax({
+                dataType: obj['dataType'] ? obj['dataType'] : "JSON",
+                url: obj['url'],
+                type: obj['type'] ? obj['type'] : "GET",
+                data: obj['data'],
+                retryCount: obj['retryCount'] ? obj['retryCount'] : 0,
+                retryLimit: 10,
+                success: function (data) {
+                    if (typeof obj['success'] == 'function') {
+                        obj['success'](data);
+                    }
+                    //todo:add loaders
+                    //parent.set('loading', false);
+                },
+                error: function (data) {
+                    if (data.status >= 499 && this.retryCount < this.retryLimit) {
+                        obj['retryCount'] = obj['retryCount'] ? obj['retryCount'] + 1 : 1;
+                        setTimeout(function () {
+                            parent.ajax(obj);
+                        }, 2000);
+                    } else {
+                        if (typeof obj['error'] == 'function') {
+                            obj['error'](data);
+                        }
+                    }
+                }
+            });
+        },
         focusOut:function (event) {
             if (this.get('ulVisible')) {
                 this.send('focusOut', event);
@@ -97,6 +129,7 @@
             return filteredContent.toArray();
         },
         searchTextObserver:function () {
+
             if (!this.get('isAutoCompleteOn')) {
                 return;
             }
@@ -106,24 +139,27 @@
             }
             var parent = this;
             var searchText = this.get('searchText');
-            if (searchText.length < this.get('minLength')) {
+            if (!Ember.isEmpty(searchText) && searchText.length < this.get('minLength')) {
                 this.set('searchResults', []);
-            } else {
+            } else if(!Ember.isEmpty(searchText) && searchText.length >= this.get('minLength')) {
                 var items = [];
                 var url = this.get('url');
                 if (Ember.isEmpty(this.get('localdata'))) {
-                    items = this.get('cache').get(url + searchText);
+                    var completeurl = (this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText);
+                    items = this.get('cache').get(completeurl);
                     if (Ember.isEmpty(items)) {
-                        $.ajax({
+                        parent.ajax({
                             type:"GET",
-                            url:(this.get('qParam')) == null ? (url + searchText) : (url + "?" + this.get('qParam') + "=" + searchText),
-                            async:true
-                        }).done(function (data) {
-                                items = JSON.parse(data);
-                                parent.get('cache').set(url + searchText, items);
+                            url:completeurl,
+                            async:true,
+                            dataType:'JSON',
+                            success:function(data){
+                                items = data;
+                                parent.get('cache').set(completeurl, items);
                                 parent.setSearchResults(parent.prepareSearchResults(items, parent));
                                 parent.validateSearchText();
-                            });
+                            }
+                        });
                     } else {
                         parent.setSearchResults(parent.prepareSearchResults(items, parent));
                         parent.validateSearchText();
@@ -155,7 +191,8 @@
             return auto;
         },
         setSearchResults:function (results) {
-            this.set('searchResults', results.splice(0,7));
+            var limit=this.get('listLimit');
+            this.set('searchResults', results.splice(0,limit));
         },
         actions:{
             changeText:function (internal_id) {
@@ -163,14 +200,19 @@
                     internal_id = this.get('currentIndex');
                 }
                 if (internal_id == -1)return;
-                if (this.get('searchResults').length == 0)return;
+                if (this.get('searchResults').length == 0){
+                    this.set('enterEvent',true);
+                    return;
+                }
                 var obj = this.get('searchResults').filterBy('internal_id', internal_id).get(0);
                 this.set('populateResults', false);
                 this.set('searchText', obj.get(this.get('primaryText')));
+                this.set('searchObj', obj);
                 this.set('value', obj.get(this.get('valueType')));
                 this.validateSearchText();
                 this.set('searchResults', Ember.A());
                 this.set('populateResults', true);
+                this.set('enterEvent',false);
             },
             traverse:function (event) {
                 var keyCode = event.keyCode;
@@ -214,7 +256,7 @@
             }
 
             this.set('isValid', valid);
-            if(!valid && searchText.length>0)
+            if(!valid && Ember.isEmpty(searchText) && searchText.length>0)
             {
                 this.set('cssclass','input-error');
             }else{

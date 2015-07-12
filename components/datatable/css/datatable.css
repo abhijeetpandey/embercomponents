@@ -117,15 +117,15 @@ body {
 
 .dataTable>thead>tr>th {
     background: #333;
-    /*border-right: #777 solid 1px;*/
-    text-align: center;
+    text-align: left;
     font-size: 13px;
     color: #fff;
-    font-weight: bold;
+    font-weight: normal;
     padding: 3px 10px 0;
     height: 35px;
     width: auto;
     white-space: nowrap;
+    vertical-align: middle;
 }
 
 .dataTable>tbody>tr>td {
@@ -150,22 +150,16 @@ body {
 
 .topBox {
     margin: 0 auto 10px;
-    height: 36px;
     padding: 9px;
     border: #cececf solid 1px;
     background: #fff;
 }
 
 .topBox-item {
-    float: left;
     width: auto;
-    height: 35px;
-    margin: 0 10px 0 0;
-}
-
-.inputBox-input-div {
-    float: left;
-    height: 33px;
+    margin: 0 7px 0 0;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .searchBox-input {
@@ -183,8 +177,6 @@ body {
 }
 
 .selectBox {
-    float: left;
-    height: 35px;
     border: #cececf solid 1px;
     background: #fafafa;
 }
@@ -251,15 +243,9 @@ body {
     background: url(../../../images/delete-small.png) no-repeat;
 }
 
-.sortIcon {
-    display: block;
-    padding: 4px;
-    background-repeat: no-repeat !important;
-    background-size: 14px 22px !important;
-}
 
 .both {
-    background: url(../../../images/sort_both.png);
+    background: url(../../../images/sort_both.png) no-repeat;
 }
 
 .active-asc {
@@ -316,17 +302,16 @@ body {
 }
 
 .sortIcon {
-    display: block;
-    padding: 7px;
-    background-repeat: no-repeat !important;
-    background-size: 13px 13px !important;
-    /*background-position-y: 9px;*/
-    /*background-position-x: -4px;*/
+    padding: 7px 7px 7px 7px;
     font-weight: normal;
     color: #BEBBBB;
     text-align: left;
-    padding-left: 12px;
-    background-position: 0px 10px;
+    display: inline-block;
+    background-size: 13px 13px;
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: top;
+    vertical-align: middle;
 }
 
 .table-component .table {
@@ -336,11 +321,6 @@ body {
 
 .inputBox {
     background: #fafafa;
-}
-
-.inputBox-input-div {
-    float: left;
-    height: 33px;
 }
 
 .searchBox-input {
@@ -382,7 +362,7 @@ body {
 .search>div>input {
     background: url(../../../images/search-generic-icon.png) no-repeat;
     width: 160px;
-    background-position: 174px;
+    background-position: right 5px center;
     height: 35px;
     padding-right: 30px;
 }

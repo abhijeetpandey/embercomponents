@@ -38,17 +38,13 @@
     list-style: none;
 }
 
-#cc-auto{
-    height: 35px;
-}
-
 .input>div>input, #cc-auto>input {
     border: none;
     font-weight: normal;
     font-size: 13px !important;
     color: #666 !important;
     background: none;
-    height: 100%;
+    height: 35px;
     padding: 0px 5px 0 10px;
     outline: none;
     transition: all 0.25s ease-in-out;

@@ -3,11 +3,18 @@
     Ember.TEMPLATES['dataTableRow'] = Ember.Handlebars.compile("<td>{{id}}</td><td>{{name}}</td><td>{{age}}</td>");
     Ember.TEMPLATES['components/data-table'] = Ember.Handlebars.compile("" +
         "<div {{bind-attr class=cssClass}}>  </div>" +
-        "<div class='table-component'>" +
+        "<div class='table-component' style='position: relative;'>" +
+        "{{#if table.loading}}" +
+        "<div style=' background: rgba(171,171,171,0.64); width: 100%; position: absolute;opacity :0.1;height: 100%;'> </div>" +
+        "{{/if}}" +
         "    <div class='topBox'> {{#if table.searchable}}" +
         "        <div class='topBox-item'>" +
         "            <div class='inputBox search'>" +
-        "                <div class='inputBox-input-div'> {{input type='text' value=table.search class='searchBox-input'}}</div>" +
+        "               {{#if table.isAjaxified}}" +
+        "                <div class='inputBox-input-div'> {{input type='text' placeholder='Type to search & press enter' value=table.searchWrapper class='searchBox-input' action='searchAction'}}</div>" +
+        "               {{else}}" +
+        "                <div class='inputBox-input-div'> {{input type='text' placeholder='Type to search' value=table.search class='searchBox-input'}}</div>" +
+        "               {{/if}}" +
         "            </div>" +
         "        </div>" +
         "        {{/if}} {{#if table.pagination}}" +
@@ -24,7 +31,7 @@
         "        </div>" +
         "        <div class='topBox-item'>" +
         "            <div class='inputBox'>" +
-        "                <div class='inputBox-input-div'> {{auto-complete minLength=1 isValid=table.isValidFilterValue localdata=table.autodata placeholder=table.placeholder searchText=table.filterValue" +
+        "                <div class='inputBox-input-div'> {{auto-complete minLength=1 url=table.autodataUrl qParam=table.autodataQparam isValid=table.isValidFilterValue localdata=table.autodata placeholder=table.placeholder searchText=table.filterValue" +
         "                    class='input'}}" +
         "                </div>" +
         "            </div>" +
@@ -42,7 +49,7 @@
         "            <div class='tag-remove-icon'></div>" +
         "            </a>         </div>" +
         "        {{/each}}" +
-        "   <div class='tag-text' style='color: #999; float: right; font-size: 11px; font-style: italic; position: relative; top: 6px;'>{{table.fullData.length}} of {{table.content.length}} items(s) </div>" +
+        "   <div class='tag-text' style='color: #999; float: right; font-size: 11px; font-style: italic; position: relative; top: 6px;'>{{table.selectedItems}} of {{table.totalItems}} item(s) </div>" +
         "    </div>" +
         "    {{/if}}" +
         "    <div class='table'>" +
@@ -51,18 +58,44 @@
         "        <table class='dataTable'>" +
         "            <thead>" +
         "            <tr> {{#each header in table.headers}}" +
+        "{{#if table.sortable}}" +
         "            <th> {{#if table.queryParamsEnabled}} {{#link-to linkRouter (query-params page=1 sortBy=header.name" +
         "                order=header.order) }}" +
         "                <div" +
-        "                {{bind-attr class=header.class}}>{{header.header}}" +
+        "                {{bind-attr class=header.class}}" +
+        " ></div>" +
+        "                <div style='display: inline-block'>" +
+        "                {{header.header}}" +
         "    </div>" +
         "    {{/link-to}} {{else}} <a {{action 'getSortedContent' header.name}} >" +
         "    <div" +
-        "    {{bind-attr class=header.class}}>{{header.header}}" +
-        "</div></a>                     {{/if}}                 </th>                 {{/each}}             </tr>             </thead>" +
-        "<tbody> {{#each row in table.paginatedContent }} {{view Ember.DataTableRowView contextBinding='row'" +
+        "    {{bind-attr class=header.class}}" +
+        " ></div>" +
+        "  <div style='display: inline-block'>" +
+        " {{header.header}}" +
+        "</div></a>                     {{/if}}                 </th>               " +
+        "{{else}}" +
+        "<th><div style='display: inline-block'>  {{header.header}} </div></th>" +
+        "{{/if}}    " +
+        " {{/each}}             </tr>             </thead>" +
+        "<tbody>" +
+        "{{#if table.paginatedContent}}" +
+        " {{#each row in table.paginatedContent }} {{view Ember.DataTableRowView contextBinding='row'" +
         "rowTemplate=table.rowTemplate table=table}} {{/each}}" +
+        "{{else}}" +
+            "{{#if table.loading}}" +
+            "<tr><td style='text-align:center;' colspan='100%'><img src='/misc/ajax_loader_d.gif'></td></tr>" +
+            "{{else}}" +
+            "{{#if table.tableEmptyMessage}}" +
+            "{{{table.tableEmptyMessage}}}" +
+            "{{else}}" +
+            "<tr><div style='text-align: center;'>Oops! we don't have data.</div></tr>" +
+            "{{/if}}" +
+            "{{/if}}" +
+        "{{/if}}" +
         "</tbody>         </table>     </div>      {{#if table.pagination}}" +
+        "{{#if table.loading}}" +
+        "{{else}}" +
         "<div class='paginationbox'>" +
         "<ul>" +
         " {{#if table.queryParamsEnabled}}" +
@@ -123,6 +156,7 @@
         "{{/if}}" +
         "</ul>" +
         "</div>" +
+        "{{/if}}" +
         "   {{/if}} </div>");
 
     String.prototype.capitalize = function () {
@@ -232,6 +266,9 @@
             }
         }.property('currentPage', 'availablePages'),
         availablePages:function () {
+            if (this.get('isAjaxified')) {
+                return 0;
+            }
             var totalPages = Math.ceil((this.get('fullData.length') / this.get('itemsPerPage')) || 1);
             if (this.get('currentPage') > totalPages) {
                 this.set('page', totalPages);
@@ -240,12 +277,15 @@
             return totalPages;
         }.property('fullData.length', 'itemsPerPage'),
         paginatedContent:function () {
+            if (this.get('isAjaxified')) {
+                return this.get('list');
+            }
             var currentPage = this.get('currentPage') || 1;
             var upperBound = (currentPage * this.get('itemsPerPage'));
             var lowerBound = (currentPage * this.get('itemsPerPage')) - this.get('itemsPerPage');
             var models = this.get('fullData');
             return models.slice(lowerBound, upperBound);
-        }.property('content.length', 'currentPage', 'fullData.@each', 'itemsPerPage'),
+        }.property('content.length', 'currentPage', 'fullData.@each', 'itemsPerPage', 'list'),
         actions:{
             nextPage:function () {
                 if (this.get('currentPage') >= this.get('availablePages')) {
@@ -266,7 +306,10 @@
     });
 
     Ember.DataTableMixin = Ember.Mixin.create(Ember.ColumnNamesMixin, Ember.SortableMixin, Ember.PaginationMixin, {
+        isAjaxified:false,
+        ajaxUrl:'',
         headerAlias:null,
+        sortable:true,
         searchable:true,
         filterable:true,
         sortProperties:['id'],
@@ -278,25 +321,97 @@
         propertiesToSearch:[],
         propertyAliasMap:Ember.Map.create(),
         aliasPropertyMap:Ember.Map.create(),
-        autodata:function () {
+        queryStringChanged:'',
+        list:function()
+        {
+            //implement this function;
+        }.property('queryString'),
+        selectedItems:function () {
+            return this.get('fullData').length;
+        }.property('fullData.length'),
+        totalItems:function () {
+            return this.get('content').length;
+        }.property('content.length'),
+        queryString:function () {
+            var queryParams = this.get('queryParams');
+            var parent = this;
+            var queryString = Ember.A();
+            $.each(queryParams, function (key, value) {
+                if (!Ember.isEmpty(parent.get(value)) && typeof parent.get(value) != 'function') {
+                    queryString.push(value + "=" + encodeURIComponent(parent.get(value)));
+                }
+            });
+            queryString = queryString.join("&");
+            if(this.get('queryStringChanged') != queryString){
+                this.set('queryStringChanged', queryString);
+            }
+            return queryString;
+        }.property('sortBy', 'page', 'itemsPerPage', 'filterBy', 'order', 'search'),
+        autodataUrl:function(){
             var currentFilter = this.getPropertyFromAlias(this.get('filterName'));
             if (Ember.isEmpty(currentFilter))
                 return;
+            var param = this.get('autodataQparam');
+
+            if(Ember.isEmpty(param))
+            {
+                return null;
+            }else{
+                return this.get('ajaxUrl') +"/autocomplete/";
+            }
+        }.property('filterName','autodataQparam'),
+        autodataQparam:function(){
+            var currentFilter = this.getPropertyFromAlias(this.get('filterName'));
+            if (Ember.isEmpty(currentFilter))
+                return;
+            var autodataQparams = Ember.Object.create(this.get('autodataQparams'));
+            if(Ember.isEmpty(autodataQparams.get(currentFilter)))
+            {
+                return null;
+            }else{
+                return this.get('queryString')+"&qparam="+currentFilter+"&"+autodataQparams.get(currentFilter);
+            }
+        }.property('filterName','queryString'),
+        autodata:function () {
             var autodata = Ember.A();
             var data = Ember.A();
-            this.get('fullData').forEach(function (item) {
-                data.push(Ember.Object.create(item).get(currentFilter));
-            });
-            data = data.uniq();
-            data.forEach(function (item) {
-                if(!Ember.isEmpty(item))
-                {
-                    autodata.push({text:item});
+            var currentFilter = this.getPropertyFromAlias(this.get('filterName'));
+            if (Ember.isEmpty(currentFilter))
+                return;
+
+            if (this.get('isAjaxified')) {
+                var aa = Ember.Object.create(this.get('filters_autodata'));
+                if (Ember.isEmpty(aa)) {
+                    return [];
                 }
-            });
+                try {
+                    data = aa.get(currentFilter);
+                } catch (e) {
+
+                }
+                if (Ember.isEmpty(data)) {
+                    return null;
+                }
+            }
+            else {
+                this.get('fullData').forEach(function (item) {
+                    data.push(Ember.Object.create(item).get(currentFilter));
+                });
+            }
+            if (!Ember.isEmpty(data)) {
+                data = data.uniq();
+                data.forEach(function (item) {
+                    if (!Ember.isEmpty(item)) {
+                        autodata.push({text:item});
+                    }
+                });
+            }
             return autodata;
-        }.property('filterName'),
+        }.property('filterName', 'filters_autodata', 'model'),
         actions:{
+            searchAction:function(){
+                this.set('search',this.get('searchWrapper'));
+            },
             propSort:function (property) {
                 var order = this.get('order');
                 this.set('order', (this.sortProperties[0] === property ? ((!Ember.isEmpty(order) ? ( order == 'asc' ? 'desc' : 'asc') : 'desc')) : 'asc'));
@@ -307,9 +422,8 @@
 
                 var filterName = this.get('filterName');
                 var filterValue = this.get('filterValue');
-                if(!this.get('isValidFilterValue'))
-                {
-                    alert("Can't apply filter, enter a valid Filter Value. "+this.get('placeholder'));
+                if (!this.get('isValidFilterValue')) {
+                    alert("Can't apply filter, enter a valid Filter Value. " + this.get('placeholder'));
                     return;
                 }
 
@@ -426,7 +540,7 @@
             var parent = this;
             var hiddenProperties = this.get('hidden');
             $.each(properties, function (key, value) {
-                if ($.inArray(value, hiddenProperties)<0) {
+                if ($.inArray(value, hiddenProperties) < 0) {
                     obj.push({
                         header:parent.getPropertyAlias(value),
                         name:value,
@@ -452,7 +566,7 @@
             });
             this.set('filterName', availableFilters[0]);
             return availableFilters;
-        }.property('appliedFilters.length'),
+        }.property('appliedFilters.length', 'filters.length'),
         filters:function () {
             return this.get('properties');
         }.property('properties'),
@@ -490,7 +604,7 @@
 
                 $.each(appliedFilters, function (key, value) {
                     var propertyFromAlias = parent.getPropertyFromAlias(value.name);
-                    if (properties.indexOf(propertyFromAlias) > 0) {
+                    if (properties.indexOf(propertyFromAlias) > -1) {
                         valid = valid && (element.get(propertyFromAlias).toString() == value.value.toString());
                     }
                 });
@@ -529,11 +643,11 @@
         appliedFiltersObserver:function () {
             this.set('page', 1);
         }.observes('fullData.length'),
-        filterNameObserver:function(){
+        filterNameObserver:function () {
             var filterPlaceHolders = this.get('filterPlaceHolders');
             var filterName = this.get('filterName');
-            if(!Ember.isEmpty(filterPlaceHolders)){
-                this.set('placeholder',filterPlaceHolders.get(this.getPropertyFromAlias(filterName)));
+            if (!Ember.isEmpty(filterPlaceHolders)) {
+                this.set('placeholder', filterPlaceHolders.get(this.getPropertyFromAlias(filterName)));
             }
         }.observes('filterName')
     });
@@ -546,11 +660,11 @@
             var navs = parentElement.find('.nav');
             navs.hide();
 
-            navs.mouseover(function(){
-                var dataTable = $(this.parentNode).find('.dataTable') ;
-                if($(this).hasClass('right-nav')){
+            navs.mouseover(function () {
+                var dataTable = $(this.parentNode).find('.dataTable');
+                if ($(this).hasClass('right-nav')) {
                     dataTable.parent().animate({scrollLeft:dataTable.width()});
-                }else if($(this).hasClass('left-nav')){
+                } else if ($(this).hasClass('left-nav')) {
                     dataTable.parent().animate({scrollLeft:0});
                 }
             });
@@ -561,21 +675,19 @@
                 if (isScrollable) {
                     var navs = $(parentElement.parentNode).find('.nav');
                     navs.css('position', 'fixed');
-                    var diffPos = $(this).position().top + 150;
-                    navs.css('top',diffPos);
-                    $(parentElement).find('.right-nav').css('left', ($(parentElement).position().left + $(parentElement).width()) - 30);
-                    if(dataTable.parent().height()-$(window).scrollTop()>200)
-                    {
+                    var diffPos = $(this).position().top + dataTable.parent().offset().top ;
+                    navs.css('top', diffPos);
+                    $(parentElement).find('.right-nav').css('left', ($(parentElement).position().left + $(parentElement).width()+$(parentElement).offset().left) - 30);
+                    if (dataTable.parent().height() - $(window).scrollTop() > 200) {
                         navs.fadeIn();
-                    } else{
+                    } else {
                         navs.hide();
                     }
                 }
 
-                $(window).on('scroll',function(){
+                $(window).on('scroll', function () {
                     var navs = dataTable.parent().find('.nav');
-                    if(!(dataTable.parent().height()-$(window).scrollTop()>200))
-                    {
+                    if (!(dataTable.parent().height() - $(window).scrollTop() > 200)) {
                         navs.hide();
                     }
                 });
@@ -652,6 +764,15 @@
                 var parent = this;
                 this.triggerAction({
                     action:'applyFilter',
+                    target:parent.get('table')
+                });
+                this.send('ready');
+            },
+            searchAction:function () {
+                this.send('loading');
+                var parent = this;
+                this.triggerAction({
+                    action:'searchAction',
                     target:parent.get('table')
                 });
                 this.send('ready');
